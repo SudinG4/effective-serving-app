@@ -1,17 +1,62 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Home, Login, Signup, Dashboard, Quiz, Results, NotFound } from './pages';
-import About from "./screens/about";
+import {
+  Home,
+  Login,
+  Signup,
+  Dashboard,
+  Quiz,
+  Results,
+  NotFound
+} from './pages';
+import About from './screens/about';
 
-export default function App(){
-  return <Routes>
-    <Route path="/" element={<Home/>}/>
-    <Route path="/about" element={<About/>}/>
-    <Route path="/login" element={<Login/>}/>
-    <Route path="/signup" element={<Signup/>}/>
-    <Route path="/dashboard" element={<Dashboard/>}/>
-    <Route path="/quiz" element={<Quiz/>}/>
-    <Route path="/results" element={<Results/>}/>
-    <Route path="/404" element={<NotFound/>}/>
-    <Route path="*" element={<Navigate to="/404" replace/>}/>
-  </Routes>;
+function ProtectedRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem('wbc-user') || 'null');
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/quiz"
+        element={
+          <ProtectedRoute>
+            <Quiz />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/results"
+        element={
+          <ProtectedRoute>
+            <Results />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
+    </Routes>
+  );
 }

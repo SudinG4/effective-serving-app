@@ -6,7 +6,11 @@ import {
   Dashboard,
   Quiz,
   Results,
-  NotFound
+  NotFound,
+  AboutScreening,
+  FAQs,
+  PrivacyPolicy,
+  Terms
 } from './pages';
 import About from './screens/about';
 
@@ -27,6 +31,11 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+
+      <Route path="/about-screening" element={<AboutScreening />} />
+      <Route path="/faqs" element={<FAQs />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
 
       <Route
         path="/dashboard"

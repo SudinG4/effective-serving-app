@@ -942,3 +942,302 @@ export function NotFound() {
     </main>
   );
 }
+  export function AboutScreening() {
+  return (
+    <>
+      <PublicHeader />
+
+      <main className="info-page">
+        <div className="info-container">
+          <p className="info-eyebrow">Resources</p>
+
+          <h1>About screening</h1>
+
+          <p className="info-lead">
+            WellBeingCheck is designed to help you reflect on your current
+            wellbeing and understand how you have been tracking across several
+            areas of everyday life.
+          </p>
+
+          <section className="info-section">
+            <h2>What is wellbeing screening?</h2>
+
+            <p>
+              Wellbeing screening uses a structured set of questions to help
+              identify patterns in areas such as mood, stress, everyday
+              functioning and emotional wellbeing.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>What does the assessment do?</h2>
+
+            <p>
+              The assessment asks you a series of questions and provides a
+              summary based on your responses. The result is intended to
+              support reflection and awareness rather than provide a clinical
+              diagnosis.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>What areas are assessed?</h2>
+
+            <p>
+              WellBeingCheck looks at multiple areas of wellbeing to give you
+              a broader picture of how you may currently be tracking.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Who is it for?</h2>
+
+            <p>
+              The tool is intended for people who want a simple way to check
+              in with themselves and better understand their current
+              wellbeing.
+            </p>
+          </section>
+
+          <Disclaimer />
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
+
+
+export function FAQs() {
+  const questions = [
+    {
+      question: 'How long does the assessment take?',
+      answer:
+        'The assessment is designed to take only a few minutes to complete.'
+    },
+    {
+      question: 'Is WellBeingCheck a medical diagnosis?',
+      answer:
+        'No. WellBeingCheck is a screening and self-reflection tool. It does not provide a medical diagnosis.'
+    },
+    {
+      question: 'Can I take the assessment again?',
+      answer:
+        'Yes. You can complete another assessment whenever you want to check in with your wellbeing again.'
+    },
+    {
+      question: 'Where are my results stored?',
+      answer:
+        'In this demonstration version, account and assessment information is stored locally in your browser.'
+    },
+    {
+      question: 'Can other people see my results?',
+      answer:
+        'This demo is designed to keep your information within the browser you are using. However, it should not be treated as a production-grade system for storing sensitive information.'
+    },
+    {
+      question: 'What should I do if I am worried about my results?',
+      answer:
+        'Consider discussing your concerns with a qualified health professional. If you are in immediate danger, contact your local emergency service.'
+    }
+  ];
+
+  return (
+    <>
+      <PublicHeader />
+
+      <main className="info-page">
+        <div className="info-container">
+          <p className="info-eyebrow">Resources</p>
+
+          <h1>Frequently asked questions</h1>
+
+          <p className="info-lead">
+            Find answers to common questions about WellBeingCheck and how the
+            assessment works.
+          </p>
+
+          <div className="faq-list">
+            {questions.map(({ question, answer }) => (
+              <details className="faq-item" key={question}>
+                <summary>{question}</summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
+
+export function PrivacyPolicy() {
+  return (
+    <>
+      <PublicHeader />
+
+      <main className="info-page">
+        <div className="info-container">
+          <p className="info-eyebrow">Legal</p>
+
+          <h1>Privacy policy</h1>
+
+          <p className="info-updated">Last updated: August 2026</p>
+
+          <p className="info-lead">
+            This page explains how information used by the WellBeingCheck
+            demonstration application is handled.
+          </p>
+
+          <section className="info-section">
+            <h2>Information we use</h2>
+
+            <p>
+              WellBeingCheck may use information you provide when creating an
+              account and completing wellbeing assessments. This can include
+              basic account information and your assessment responses.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>How information is used</h2>
+
+            <p>
+              Information is used to provide application functionality,
+              calculate assessment results and display wellbeing information
+              back to you.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Local browser storage</h2>
+
+            <p>
+              This demonstration currently stores information in your browser
+              using local storage. Local storage allows the application to
+              retain information between pages and browser sessions.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Sensitive information</h2>
+
+            <p>
+              This demonstration should not be treated as a production-grade
+              platform for collecting or storing sensitive health information.
+              A real-world system would require stronger security, privacy and
+              data-governance controls.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Data sharing</h2>
+
+            <p>
+              The current browser-based demonstration is not designed to sell
+              or share assessment responses with third parties.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Demonstration notice</h2>
+
+            <p>
+              This privacy policy is included for demonstration purposes and
+              should not be considered a professionally reviewed privacy policy
+              for a production healthcare service.
+            </p>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
+
+export function Terms() {
+  return (
+    <>
+      <PublicHeader />
+
+      <main className="info-page">
+        <div className="info-container">
+          <p className="info-eyebrow">Legal</p>
+
+          <h1>Terms of use</h1>
+
+          <p className="info-updated">Last updated: August 2026</p>
+
+          <p className="info-lead">
+            These terms describe the intended use and limitations of the
+            WellBeingCheck demonstration application.
+          </p>
+
+          <section className="info-section">
+            <h2>Purpose of WellBeingCheck</h2>
+
+            <p>
+              WellBeingCheck provides general wellbeing screening and
+              informational feedback to support personal reflection.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Not medical advice</h2>
+
+            <p>
+              Assessment results and information provided by WellBeingCheck do
+              not constitute medical advice, diagnosis or treatment.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>No emergency services</h2>
+
+            <p>
+              WellBeingCheck is not an emergency or crisis service. If you are
+              in immediate danger or require urgent assistance, contact your
+              local emergency service.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Responsible use</h2>
+
+            <p>
+              You should use the application only for its intended purpose and
+              should not attempt to interfere with, damage, misuse or disrupt
+              the application or its functionality.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Accuracy and limitations</h2>
+
+            <p>
+              The results produced by this demonstration depend on the
+              responses provided and are intended only as general wellbeing
+              guidance. They should not replace professional assessment.
+            </p>
+          </section>
+
+          <section className="info-section">
+            <h2>Demonstration application</h2>
+
+            <p>
+              WellBeingCheck is currently presented as a demonstration
+              application. Features, data-handling practices and functionality
+              may change during development.
+            </p>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}

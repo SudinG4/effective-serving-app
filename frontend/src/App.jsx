@@ -1,9 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Home, Login, Signup, Dashboard, Quiz, Results, NotFound } from './pages';
+import About from "./screens/about";
 
 export default function App(){
   return <Routes>
     <Route path="/" element={<Home/>}/>
+    <Route path="/about" element={<About/>}/>
     <Route path="/login" element={<Login/>}/>
     <Route path="/signup" element={<Signup/>}/>
     <Route path="/dashboard" element={<Dashboard/>}/>

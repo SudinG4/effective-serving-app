@@ -3,7 +3,25 @@ import { HeartPulse, ShieldCheck, FileText, ListChecks, ChartNoAxesCombined, Hou
 
 export function Logo(){return <Link className="logo" to="/" aria-label="WellBeingCheck home"><span className="logo-mark"><HeartPulse size={21}/></span><span>WellBeingCheck</span></Link>}
 
-export function PublicHeader(){return <header className="public-header"><div className="shell nav"><Logo/><div className="nav-actions"><Link className="text-link" to="/login">Log In</Link><Link className="button small" to="/signup">Get Started</Link></div></div></header>}
+export function PublicHeader() {
+  return (
+    <header className="public-header">
+      <div className="shell nav">
+        <Logo />
+
+        <div className="nav-actions">
+          <Link className="text-link" to="/about">
+            About Us
+          </Link>
+
+          <Link className="text-link" to="/login">
+            Log In
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
 
 export function Footer(){return <footer><div className="shell footer-grid"><div><Logo/><p className="muted footer-about">Evidence-informed wellbeing screening that gives people clear, private insight into how they’re really tracking.</p></div><div><h3>Product</h3><Link to="/">Home</Link><Link to="/quiz">Assessment</Link><Link to="/dashboard">Dashboard</Link></div><div><h3>Resources</h3><a href="#about">About screening</a><a href="#faq">FAQs</a><a href="#privacy">Privacy policy</a><a href="#terms">Terms</a></div><div><h3>Crisis support</h3><p className="muted small-copy">If you are in immediate danger, call your local emergency service. This demo does not provide emergency care.</p></div></div><div className="shell footer-bottom"><span>© 2026 WellBeingCheck</span><span>Screening tool only — not a diagnosis.</span></div></footer>}
 

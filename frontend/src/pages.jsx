@@ -11,10 +11,25 @@ const storage = {
 };
 
 export function Home(){return <><PublicHeader/><main>
-  <section className="hero shell"><div className="hero-copy"><span className="eyebrow"><Sparkles size={16}/> Evidence-informed wellbeing screening</span><h1>Understand Your Wellbeing — Clearly</h1><p className="lead">A 27-point self-assessment across five domains. Answer honestly and get an instant, private report that helps guide your next step.</p><div className="hero-actions"><Link className="button" to="/signup">Get Started <ArrowRight size={18}/></Link><Link className="button secondary" to="/login">Log In</Link></div><p className="micro">Takes about 8 minutes. No diagnosis — a screen to guide your next step.</p></div>
+  <section className="hero shell"><div className="hero-copy">
+    <span className="eyebrow">
+      <Sparkles size={16}/>
+      Trauma-informed wellbeing
+      </span>
+      <h1>Check Your Wellbeing</h1>
+      <p className="lead">
+        A wellbeing check designed to help you understand how you're doing, recognise areas of concern, and identify where support may be helpful.
+      </p>
+  <div className="hero-actions">
+    <Link className="button" to="/signup">
+      Start Assessment <ArrowRight size={18}/>
+    </Link>
+  </div>
+  <p className="micro">
+    27 questions · About 8 minutes · Private results
+  </p></div>
   <div className="sample-card"><div className="sample-top"><span>Sample result</span><span className="status safe">Screening complete</span></div><div className="score-ring"><strong>58</strong><span>/ 108</span></div>{['Emotional Health','Stress & Anxiety','Sleep & Energy'].map((x,i)=><div className="mini-row" key={x}><span>{x}</span><div><i style={{width:`${[68,51,76][i]}%`}}/></div></div>)}</div></section>
   <section className="features shell">{featureData.map(([Icon,title,text])=><article key={title}><span className="icon"><Icon/></span><h3>{title}</h3><p>{text}</p></article>)}</section>
-  <section className="cta shell"><h2>Ready to check in with yourself?</h2><p>It only takes a few minutes, and what you learn is yours to keep.</p><Link className="button light" to="/quiz">Start Assessment <ArrowRight size={18}/></Link></section>
   </main><Footer/></>}
 
 function AuthShell({signup=false}){

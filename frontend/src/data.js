@@ -6,28 +6,6 @@ const prompts = [
   ['Emotional Health','found it hard to feel positive about the future?'],
   ['Emotional Health','felt emotionally overwhelmed?'],
   ['Emotional Health','been unusually irritable or frustrated?'],
-  ['Emotional Health','felt able to manage difficult emotions?'],
-  ['Stress & Anxiety','felt nervous, anxious, or on edge?'],
-  ['Stress & Anxiety','been unable to stop or control worrying?'],
-  ['Stress & Anxiety','worried too much about different things?'],
-  ['Stress & Anxiety','found it difficult to relax?'],
-  ['Stress & Anxiety','felt restless or unable to sit still?'],
-  ['Stress & Anxiety','felt afraid something awful might happen?'],
-  ['Sleep & Energy','had trouble falling or staying asleep?'],
-  ['Sleep & Energy','woken without feeling refreshed?'],
-  ['Sleep & Energy','felt tired or had very little energy?'],
-  ['Sleep & Energy','found your sleep schedule difficult to maintain?'],
-  ['Sleep & Energy','struggled to concentrate because of tiredness?'],
-  ['Social Connection','felt lonely or isolated from others?'],
-  ['Social Connection','felt that you had someone to talk to?'],
-  ['Social Connection','avoided friends, family, or social situations?'],
-  ['Social Connection','felt supported by people around you?'],
-  ['Social Connection','found it hard to connect meaningfully with others?'],
-  ['Daily Functioning','found it difficult to complete everyday responsibilities?'],
-  ['Daily Functioning','struggled to concentrate on work or study?'],
-  ['Daily Functioning','found it difficult to make everyday decisions?'],
-  ['Daily Functioning','felt unable to keep up with your usual routine?'],
-  ['Daily Functioning','felt that your wellbeing affected work, study, or relationships?']
 ];
 
 export const questions = prompts.map(([domain, text], index) => ({

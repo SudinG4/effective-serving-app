@@ -31,12 +31,12 @@ export function PublicHeader() {
         <Logo />
 
         <div className="nav-actions">
-          <Link className="text-link" to="/login">
-            Log In
+          <Link className="text-link" to="/about">
+            About Us
           </Link>
 
-          <Link className="button small" to="/signup">
-            Get Started
+          <Link className="text-link" to="/login">
+            Log In
           </Link>
         </div>
       </div>

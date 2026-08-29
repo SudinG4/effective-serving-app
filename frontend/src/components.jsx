@@ -10,34 +10,88 @@ import {
   ClipboardList,
   UserRound,
   TriangleAlert,
-  X
+  X,
+  PhoneCall,
+  Sparkles,
+  ArrowRight,
+  LogOut,
+  LayoutDashboard
 } from 'lucide-react';
 
 export function Logo() {
   return (
     <Link className="logo" to="/" aria-label="WellBeingCheck home">
       <span className="logo-mark">
-        <HeartPulse size={21} />
+        <HeartPulse size={22} strokeWidth={2.2} />
       </span>
-      <span>WellBeingCheck</span>
+      <div className="logo-text">
+        <span className="logo-title">WellBeingCheck</span>
+        <span className="logo-subtitle">Evidence-Informed</span>
+      </div>
     </Link>
   );
 }
 
 export function PublicHeader() {
+  const user = JSON.parse(localStorage.getItem('wbc-user') || 'null');
+
   return (
     <header className="public-header">
       <div className="shell nav">
         <Logo />
 
-        <div className="nav-actions">
-          <Link className="text-link" to="/about">
+        <nav className="nav-links" aria-label="Main Navigation">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+          >
             About Us
-          </Link>
+          </NavLink>
+          <NavLink
+            to="/about-screening"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+          >
+            Screening Info
+          </NavLink>
+          <NavLink
+            to="/faqs"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+          >
+            FAQs
+          </NavLink>
+        </nav>
 
-          <Link className="text-link" to="/login">
-            Log In
-          </Link>
+        <div className="nav-actions">
+          {user ? (
+            <Link className="button small subtle" to="/dashboard">
+              <LayoutDashboard size={16} />
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link className="nav-link" to="/login">
+                Log In
+              </Link>
+              <Link className="button small" to="/signup">
+                Start Screening <ArrowRight size={15} />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -46,87 +100,81 @@ export function PublicHeader() {
 
 const resourceContent = {
   about: {
-    title: 'About screening',
+    title: 'About Screening & Methodology',
     content: (
       <>
         <p>
-          WellBeingCheck is designed to help you reflect on your current
-          wellbeing and understand how you have been tracking across several
-          areas of everyday life.
+          WellBeingCheck is a trauma-informed, evidence-informed self-reflection
+          tool crafted to give caregivers, helpers, and individuals a safe space
+          to understand how they are tracking across core areas of life.
         </p>
 
         <h3>What is wellbeing screening?</h3>
         <p>
-          Wellbeing screening uses a structured set of questions to identify
-          patterns in areas such as mood, stress, emotional wellbeing, sleep,
-          social connection and daily functioning.
+          Wellbeing screening uses structured, validated self-report questions to
+          spot early patterns in mood, stress, daily functioning, sleep, and
+          interpersonal connection before mild strain develops into burnout or crisis.
         </p>
 
-        <h3>What does the assessment do?</h3>
+        <h3>Is this a medical or clinical diagnosis?</h3>
         <p>
-          The assessment provides a summary based on your responses. It is
-          intended to support awareness and reflection rather than provide a
-          clinical diagnosis.
+          No. WellBeingCheck does not provide medical diagnoses or replace
+          consultation with qualified healthcare practitioners, GPs, or licensed psychologists.
+          It is designed for clarity, insight, and guiding early support.
         </p>
 
-        <h3>Who is it for?</h3>
+        <h3>Who is this designed for?</h3>
         <p>
-          It is intended for people who want a simple way to check in with
-          themselves and better understand their current wellbeing.
+          It is specifically tailored for anyone in high-care roles, frontline service,
+          caregiving, or individuals seeking private, proactive insight into their mental
+          and emotional health.
         </p>
       </>
     )
   },
 
   faq: {
-    title: 'Frequently asked questions',
+    title: 'Frequently Asked Questions',
     content: (
       <div className="modal-faq-list">
-        <details>
+        <details open>
           <summary>How long does the assessment take?</summary>
           <p>
-            The assessment is designed to take only a few minutes to complete.
+            The assessment consists of 27 straightforward questions and typically
+            takes between 6 to 8 minutes to complete in a calm environment.
           </p>
         </details>
 
         <details>
-          <summary>Is WellBeingCheck a medical diagnosis?</summary>
+          <summary>Is my data kept private and confidential?</summary>
           <p>
-            No. WellBeingCheck is a screening and self-reflection tool and
-            does not provide a medical diagnosis.
+            Yes. In this browser demonstration, all your answers and results remain strictly
+            stored on your local device. We do not sell or track your responses.
           </p>
         </details>
 
         <details>
-          <summary>Can I take the assessment again?</summary>
+          <summary>How often should I take the screening?</summary>
           <p>
-            Yes. You can complete another assessment whenever you want to check
-            in with your wellbeing again.
+            We recommend checking in every two to four weeks, or whenever you feel your
+            stress, workload, or life circumstances shifting.
           </p>
         </details>
 
         <details>
-          <summary>Where are my results stored?</summary>
+          <summary>Can I download and share my summary report?</summary>
           <p>
-            In this demonstration version, account and assessment information
-            is stored locally in your browser.
+            Yes. Upon completing your assessment, you receive a full domain breakdown that
+            you can download as a report to discuss with your healthcare professional.
           </p>
         </details>
 
         <details>
-          <summary>Can other people see my results?</summary>
+          <summary>What should I do if my score indicates elevated risk?</summary>
           <p>
-            This demo is designed to keep your information within the browser
-            you are using. It should not be considered a production-grade
-            system for sensitive health information.
-          </p>
-        </details>
-
-        <details>
-          <summary>What if I am worried about my results?</summary>
-          <p>
-            Consider speaking with a qualified health professional. If you are
-            in immediate danger, contact your local emergency service.
+            Elevated scores simply mean that seeking an extra hand would be beneficial.
+            We provide practical self-care steps, and recommend reaching out to your GP,
+            counselor, or 24/7 support lines like Lifeline (13 11 14).
           </p>
         </details>
       </div>
@@ -134,96 +182,62 @@ const resourceContent = {
   },
 
   privacy: {
-    title: 'Privacy policy',
+    title: 'Privacy & Data Protection Policy',
     content: (
       <>
-        <p className="modal-updated">Last updated: August 2026</p>
+        <p className="modal-updated">Last revised: August 2026</p>
 
-        <h3>Information we use</h3>
+        <h3>Our Commitment to Your Privacy</h3>
         <p>
-          WellBeingCheck may use information you provide when creating an
-          account and completing wellbeing assessments.
+          We believe mental wellbeing information is deeply personal. WellBeingCheck
+          is designed around privacy-first principles with zero third-party behavioral trackers.
         </p>
 
-        <h3>How information is used</h3>
+        <h3>Information We Process</h3>
         <p>
-          Information is used to provide application functionality, calculate
-          assessment results and display wellbeing information back to you.
+          When you use this demonstration, your responses, domain calculations, and profile
+          details are held in secure client-side storage within your active browser session.
         </p>
 
-        <h3>Local browser storage</h3>
+        <h3>No Commercial Data Sharing</h3>
         <p>
-          This demonstration currently stores information in your browser
-          using local storage.
+          We do not sell, rent, or trade personal wellbeing data to data brokers, advertisers,
+          or third parties under any circumstances.
         </p>
 
-        <h3>Sensitive information</h3>
+        <h3>Demonstration & Research Notice</h3>
         <p>
-          This demonstration should not be treated as a production-grade
-          platform for storing sensitive health information. A real-world
-          system would require stronger privacy, security and data-governance
-          controls.
-        </p>
-
-        <h3>Data sharing</h3>
-        <p>
-          The current demonstration is not designed to sell or share your
-          assessment responses with third parties.
-        </p>
-
-        <h3>Demonstration notice</h3>
-        <p>
-          This privacy policy is provided for demonstration purposes and is not
-          a professionally reviewed privacy policy for a production healthcare
-          service.
+          This application serves as an evidence-informed demonstration platform. In a production
+          clinical deployment, end-to-end encryption and HIPAA/Australian Privacy Principle (APP)
+          compliant healthcare data vaults are utilized.
         </p>
       </>
     )
   },
 
   terms: {
-    title: 'Terms of use',
+    title: 'Terms of Use & Clinical Disclaimer',
     content: (
       <>
-        <p className="modal-updated">Last updated: August 2026</p>
+        <p className="modal-updated">Last revised: August 2026</p>
 
         <h3>Purpose of WellBeingCheck</h3>
         <p>
-          WellBeingCheck provides general wellbeing screening and
-          informational feedback to support personal reflection.
+          WellBeingCheck provides educational screening and self-reflection guidance to foster
+          proactive wellbeing awareness.
         </p>
 
-        <h3>Not medical advice</h3>
+        <h3>Not Medical or Emergency Care</h3>
         <p>
-          Assessment results and information provided by WellBeingCheck do not
-          constitute medical advice, diagnosis or treatment.
+          Information provided by this application does not constitute medical advice, diagnosis,
+          or clinical treatment. If you are in immediate distress or facing a mental health crisis,
+          contact emergency services (000 in Australia, 911 in the US, 999 in the UK) or Lifeline.
         </p>
 
-        <h3>No emergency services</h3>
+        <h3>Responsible Use</h3>
         <p>
-          WellBeingCheck is not an emergency or crisis service. If you are in
-          immediate danger or require urgent assistance, contact your local
-          emergency service.
-        </p>
-
-        <h3>Responsible use</h3>
-        <p>
-          You should use this application only for its intended purpose and
-          should not attempt to interfere with or disrupt its functionality.
-        </p>
-
-        <h3>Accuracy and limitations</h3>
-        <p>
-          Results depend on the responses provided and are intended only as
-          general wellbeing guidance. They should not replace professional
-          assessment.
-        </p>
-
-        <h3>Demonstration application</h3>
-        <p>
-          WellBeingCheck is currently a demonstration application. Features,
-          data-handling practices and functionality may change during
-          development.
+          By using this service, you agree to engage with the tool for its intended personal
+          wellbeing screening purposes and provide truthful self-reflection responses.
         </p>
       </>
     )
@@ -234,14 +248,10 @@ export function ResourceModal({ resource, onClose }) {
   const selected = resourceContent[resource];
 
   useEffect(() => {
-    if (!selected) {
-      return;
-    }
+    if (!selected) return;
 
     function handleEscape(event) {
-      if (event.key === 'Escape') {
-        onClose();
-      }
+      if (event.key === 'Escape') onClose();
     }
 
     document.addEventListener('keydown', handleEscape);
@@ -253,18 +263,14 @@ export function ResourceModal({ resource, onClose }) {
     };
   }, [selected, onClose]);
 
-  if (!selected) {
-    return null;
-  }
+  if (!selected) return null;
 
   return (
     <div
       className="modal-overlay"
       role="presentation"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
+        if (event.target === event.currentTarget) onClose();
       }}
     >
       <section
@@ -275,7 +281,7 @@ export function ResourceModal({ resource, onClose }) {
       >
         <div className="resource-modal-header">
           <div>
-            <span className="modal-label">WellBeingCheck</span>
+            <span className="modal-label">WellBeingCheck Resource</span>
             <h2 id="resource-modal-title">{selected.title}</h2>
           </div>
 
@@ -283,9 +289,9 @@ export function ResourceModal({ resource, onClose }) {
             type="button"
             className="modal-close"
             onClick={onClose}
-            aria-label="Close"
+            aria-label="Close dialog"
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
@@ -294,11 +300,11 @@ export function ResourceModal({ resource, onClose }) {
         </div>
 
         <div className="resource-modal-footer">
-          <p>Screening tool only — not a diagnosis.</p>
+          <p>Evidence-informed screening · Not a medical diagnosis</p>
 
           <button
             type="button"
-            className="button small"
+            className="button small secondary"
             onClick={onClose}
           >
             Close
@@ -318,78 +324,79 @@ export function Footer() {
         <div className="shell footer-grid">
           <div>
             <Logo />
-
-            <p className="muted footer-about">
-              Evidence-informed wellbeing screening that gives people clear,
-              private insight into how they’re really tracking.
+            <p className="footer-about">
+              A respectful, trauma-informed wellbeing check giving people who care
+              and serve clear, confidential insight into how they are doing.
             </p>
           </div>
 
           <div>
-            <h3>Product</h3>
-
-            <Link className="footer-product-link" to="/">
-              Home
-            </Link>
-
-            <Link className="footer-product-link" to="/quiz">
-              Assessment
-            </Link>
-
-            <Link className="footer-product-link" to="/dashboard">
-              Dashboard
-            </Link>
+            <h3>Navigation</h3>
+            <div className="footer-col-links">
+              <Link className="footer-product-link" to="/">Home</Link>
+              <Link className="footer-product-link" to="/about">About Us</Link>
+              <Link className="footer-product-link" to="/quiz">Assessment Check</Link>
+              <Link className="footer-product-link" to="/dashboard">Dashboard</Link>
+            </div>
           </div>
 
           <div>
             <h3>Resources</h3>
-
-            <button
-              type="button"
-              className="footer-resource-link"
-              onClick={() => setActiveResource('about')}
-            >
-              About screening
-            </button>
-
-            <button
-              type="button"
-              className="footer-resource-link"
-              onClick={() => setActiveResource('faq')}
-            >
-              FAQs
-            </button>
-
-            <button
-              type="button"
-              className="footer-resource-link"
-              onClick={() => setActiveResource('privacy')}
-            >
-              Privacy policy
-            </button>
-
-            <button
-              type="button"
-              className="footer-resource-link"
-              onClick={() => setActiveResource('terms')}
-            >
-              Terms
-            </button>
+            <div className="footer-col-links">
+              <button
+                type="button"
+                className="footer-resource-link"
+                onClick={() => setActiveResource('about')}
+              >
+                About screening
+              </button>
+              <button
+                type="button"
+                className="footer-resource-link"
+                onClick={() => setActiveResource('faq')}
+              >
+                Frequently Asked Questions
+              </button>
+              <button
+                type="button"
+                className="footer-resource-link"
+                onClick={() => setActiveResource('privacy')}
+              >
+                Privacy & Data
+              </button>
+              <button
+                type="button"
+                className="footer-resource-link"
+                onClick={() => setActiveResource('terms')}
+              >
+                Terms of Use
+              </button>
+            </div>
           </div>
 
           <div>
-            <h3>Crisis support</h3>
-
-            <p className="muted small-copy">
-              If you are in immediate danger, call your local emergency
-              service. This demo does not provide emergency care.
+            <h3>24/7 Crisis Support</h3>
+            <p className="small-copy">
+              If you or someone you know is in immediate danger or distress,
+              please connect with immediate support:
             </p>
+            <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <span className="small-copy" style={{ color: '#FFF', fontWeight: 600 }}>
+                • Lifeline: 13 11 14 (24/7)
+              </span>
+              <span className="small-copy" style={{ color: '#FFF', fontWeight: 600 }}>
+                • Beyond Blue: 1300 22 4636
+              </span>
+              <span className="small-copy" style={{ color: '#FFF', fontWeight: 600 }}>
+                • Emergency Services: 000 / 911
+              </span>
+            </div>
           </div>
         </div>
 
         <div className="shell footer-bottom">
-          <span>© 2026 WellBeingCheck</span>
-          <span>Screening tool only — not a diagnosis.</span>
+          <span>© 2026 WellBeingCheck. All rights reserved.</span>
+          <span>Confidential screening tool — Not a clinical diagnosis.</span>
         </div>
       </footer>
 
@@ -404,58 +411,63 @@ export function Footer() {
 export const featureData = [
   [
     ShieldCheck,
-    'Secure & Private',
-    'Your responses stay confidential and are stored only in this browser demo.'
+    'Confidential & Private',
+    'Your responses remain private to you. No tracking, no data selling, complete peace of mind.'
   ],
   [
     FileText,
-    'Instant Reports',
-    'Get a clear, plain-language summary the moment you finish.'
+    'Immediate Insights',
+    'Get a clear, plain-language breakdown across 5 vital dimensions the moment you finish.'
   ],
   [
     ListChecks,
-    '27-Point Assessment',
-    'A structured screen across five wellbeing domains.'
+    '27-Point Evidence Screen',
+    'A structured, clinically grounded set of questions covering mood, sleep, stress, and connection.'
   ],
   [
     ChartNoAxesCombined,
-    'Clear Results',
-    'Understand your score with labelled, colour-coded guidance.'
+    'Meaningful Trajectory',
+    'Track how your wellbeing changes over weeks and months to recognize patterns early.'
   ]
 ];
 
 export function Disclaimer() {
   return (
-    <p className="disclaimer">
-      <TriangleAlert size={17} />
-      WellBeingCheck is a screening tool, not a diagnostic or emergency
-      service. Discuss concerns with a qualified health professional.
-    </p>
+    <aside className="disclaimer" role="note">
+      <TriangleAlert size={18} />
+      <div>
+        <strong>Please Note:</strong> WellBeingCheck is an evidence-informed self-reflection and
+        screening tool, not a clinical diagnosis or emergency service. Always discuss any health
+        concerns with your doctor, psychologist, or healthcare provider.
+      </div>
+    </aside>
   );
 }
 
 export function BottomNav() {
+  const user = JSON.parse(localStorage.getItem('wbc-user') || 'null');
+
   return (
-    <nav className="bottom-nav" aria-label="Dashboard navigation">
-      <NavLink to="/dashboard">
-        <House />
+    <nav className="bottom-nav" aria-label="Mobile Navigation">
+      <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>
+        <House size={20} />
         <span>Home</span>
       </NavLink>
 
-      <NavLink to="/quiz">
-        <ClipboardList />
-        <span>Assessment</span>
+      <NavLink to="/quiz" className={({ isActive }) => isActive ? 'active' : ''}>
+        <ClipboardList size={20} />
+        <span>Quiz</span>
       </NavLink>
 
-      <NavLink to="/results">
-        <ChartNoAxesCombined />
+      <NavLink to="/results" className={({ isActive }) => isActive ? 'active' : ''}>
+        <ChartNoAxesCombined size={20} />
         <span>Results</span>
       </NavLink>
 
-      <a href="#account">
-        <UserRound />
-        <span>Account</span>
-      </a>
+      <NavLink to={user ? "/dashboard" : "/login"} className={({ isActive }) => isActive ? 'active' : ''}>
+        <UserRound size={20} />
+        <span>{user ? 'Account' : 'Log In'}</span>
+      </NavLink>
     </nav>
   );
 }

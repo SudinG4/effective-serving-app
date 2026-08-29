@@ -41,11 +41,14 @@ import {
 } from './components';
 
 import {
-  domains,
+  assessmentSections,
+  getAnswerLabel,
   initialHistory,
-  options,
+  isAnswerComplete,
+  isQuestionVisible,
+  questionnaireTitle,
+  questionnaireVersion,
   questions,
-  riskFor
 } from './data';
 
 const API_BASE_URL =
@@ -129,13 +132,13 @@ export function Home() {
 
               <div className="trust-badges">
                 <div className="trust-badge">
-                  <Clock3 size={16} /> 27 Questions (~8 min)
+                  <Clock3 size={16} /> 14 Sections (~10 min)
                 </div>
                 <div className="trust-badge">
                   <ShieldCheck size={16} /> Private & Confidential
                 </div>
                 <div className="trust-badge">
-                  <FileText size={16} /> Instant Domain Report
+                  <FileText size={16} /> Private Response Summary
                 </div>
               </div>
             </div>
@@ -144,7 +147,7 @@ export function Home() {
               <div className="sample-card">
                 <div className="sample-top">
                   <span className="sample-label">Sample Assessment Report</span>
-                  <span className="status watch">Moderate Concern</span>
+                  <span className="status safe">Responses Recorded</span>
                 </div>
 
                 <div className="sample-score-preview">
@@ -170,40 +173,40 @@ export function Home() {
                       />
                     </svg>
                     <div className="score-inner">
-                      <span className="score-num">58</span>
-                      <span className="score-max">/108</span>
+                      <span className="score-num">✓</span>
+                      <span className="score-max">Complete</span>
                     </div>
                   </div>
 
                   <div className="sample-score-meta">
-                    <h4>Overall Wellbeing Score</h4>
-                    <p>Some areas indicate fatigue. Taking space to rest and talk is recommended.</p>
+                    <h4>Private Response Summary</h4>
+                    <p>Review your answers by section. Scoring is enabled only after company approval.</p>
                   </div>
                 </div>
 
                 <div className="sample-bars">
                   <div className="mini-row">
-                    <span>Emotional Health</span>
+                    <span>General Wellbeing</span>
                     <div className="bar-track">
                       <div className="bar-fill" style={{ width: '65%' }} />
                     </div>
-                    <span className="bar-val">15/24</span>
+                    <span className="bar-val">Recorded</span>
                   </div>
 
                   <div className="mini-row">
-                    <span>Stress & Anxiety</span>
+                    <span>Ministry Burnout</span>
                     <div className="bar-track">
                       <div className="bar-fill accent" style={{ width: '58%' }} />
                     </div>
-                    <span className="bar-val">14/24</span>
+                    <span className="bar-val">Recorded</span>
                   </div>
 
                   <div className="mini-row">
-                    <span>Sleep & Energy</span>
+                    <span>Rest & Recovery</span>
                     <div className="bar-track">
                       <div className="bar-fill sage" style={{ width: '70%' }} />
                     </div>
-                    <span className="bar-val">14/20</span>
+                    <span className="bar-val">Recorded</span>
                   </div>
                 </div>
               </div>
@@ -211,15 +214,15 @@ export function Home() {
           </div>
         </section>
 
-        {/* Five Dimensions Section */}
+        {/* Whole-person coverage */}
         <section className="domains-overview-section">
           <div className="shell">
             <div className="section-header">
               <span className="eyebrow">Comprehensive Coverage</span>
-              <h2>Five core dimensions of everyday health</h2>
+              <h2>Whole-person ministry wellbeing</h2>
               <p>
-                Rather than a one-dimensional score, our screening looks at the interrelated
-                pillars that shape how you feel and function each day.
+                The company questionnaire considers emotional, relational, spiritual and physical
+                wellbeing alongside the particular pressures of ministry.
               </p>
             </div>
 
@@ -293,8 +296,8 @@ export function Home() {
               <span className="step-number">1</span>
               <h3>Take the 8-minute check</h3>
               <p>
-                Answer 27 gentle, focused questions reflecting on your experiences over the past
-                two weeks.
+                Work through the official multi-section questionnaire, including rating scales,
+                Yes/No items and reflective checklists.
               </p>
             </div>
 
@@ -717,8 +720,9 @@ export function Dashboard() {
     hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const userName = user?.firstName || 'Friend';
-  const latestScore = history[0]?.score ?? 58;
-  const latestRisk = riskFor(latestScore);
+  const latestLabel = history[0]
+    ? history[0].completedCount !== undefined ? 'Completed' : 'Legacy'
+    : 'Not started';
 
   return (
     <>
@@ -758,13 +762,13 @@ export function Dashboard() {
             </span>
             <h2>Take your regular wellbeing check-in</h2>
             <p>
-              Complete the 27-question assessment across five core domains. It only takes about
-              8 minutes and provides an instant, actionable breakdown of how you’re tracking.
+              Complete the Centre for Effective Serving’s multi-section emotional health check for
+              ministry workers. It takes about 10 minutes and records a private response summary.
             </p>
 
             <div className="quick-facts">
-              <span><Layers size={15} /> 5 Dimensions</span>
-              <span><Clock3 size={15} /> ~8 Minutes</span>
+              <span><Layers size={15} /> 14 Sections</span>
+              <span><Clock3 size={15} /> ~10 Minutes</span>
               <span><ShieldCheck size={15} /> 100% Confidential</span>
             </div>
           </div>
@@ -785,8 +789,8 @@ export function Dashboard() {
           <article className="stat-card">
             <span className="stat-card-title">Latest Status</span>
             <span className="stat-card-value" style={{ fontSize: '24px', marginTop: '6px' }}>
-              <span className={`status ${latestRisk.className}`}>
-                {history[0]?.label || 'No Risk'}
+              <span className="status safe">
+                {latestLabel}
               </span>
             </span>
             <span className="stat-card-sub">Completed on {history[0]?.date || 'Recent'}</span>
@@ -795,9 +799,7 @@ export function Dashboard() {
           <article className="stat-card">
             <span className="stat-card-title">Check-in Cadence</span>
             <span className="stat-card-value">
-              {history.length > 1 && history[0].score < history[1].score
-                ? 'Improving'
-                : 'Steady'}
+              {history.length > 0 ? 'Active' : 'Ready'}
             </span>
             <span className="stat-card-sub">Recommended every 2–4 weeks</span>
           </article>
@@ -808,7 +810,7 @@ export function Dashboard() {
           <div className="history-header">
             <div>
               <h2>Past Assessment History</h2>
-              <p>Review your historical scores to understand long-term patterns.</p>
+              <p>Review completed company questionnaires stored on this device.</p>
             </div>
             <Link className="button small subtle" to="/quiz">
               + New Check-in
@@ -817,8 +819,6 @@ export function Dashboard() {
 
           <div className="history-list">
             {history.map((item, index) => {
-              const risk = riskFor(item.score);
-
               return (
                 <article className="history-row" key={item.date + index}>
                   <div>
@@ -827,13 +827,13 @@ export function Dashboard() {
 
                   <div>
                     <span className="history-score">
-                      {item.score} <small>/ 108</small>
+                      {item.completedCount ?? '—'} <small>responses</small>
                     </span>
                   </div>
 
                   <div>
-                    <span className={`status ${risk.className}`}>
-                      {item.label}
+                    <span className="status safe">
+                      {item.completedCount !== undefined ? 'Completed' : 'Legacy'}
                     </span>
                   </div>
 
@@ -875,26 +875,32 @@ export function Quiz() {
     JSON.parse(sessionStorage.getItem('wbc-answers') || '{}')
   );
 
-  const question = questions[index];
+  const visibleQuestions = questions.filter((item) => isQuestionVisible(item, answers));
+  const question = visibleQuestions[index];
   const selected = answers[question.id];
+  const answerComplete = isAnswerComplete(question, selected);
 
   useEffect(() => {
     sessionStorage.setItem('wbc-answers', JSON.stringify(answers));
   }, [answers]);
 
-  // Keyboard navigation for 0-4 options
   useEffect(() => {
     function handleKeyDown(e) {
-      const keyMap = { '0': 0, '1': 1, '2': 2, '3': 3, '4': 4 };
-      if (e.key in keyMap) {
-        setAnswers((prev) => ({ ...prev, [question.id]: keyMap[e.key] }));
-      } else if (e.key === 'Enter' && selected !== undefined) {
+      if (e.key === 'Escape') {
+        setShowQuitModal(true);
+      } else if (e.key === 'Enter' && answerComplete && question.type !== 'text' && question.type !== 'email') {
         next();
       }
     }
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [question.id, selected, index]);
+  }, [question.id, answerComplete, index]);
+
+  useEffect(() => {
+    if (index > visibleQuestions.length - 1) {
+      setIndex(Math.max(visibleQuestions.length - 1, 0));
+    }
+  }, [index, visibleQuestions.length]);
 
   function confirmQuit() {
     sessionStorage.removeItem('wbc-answers');
@@ -902,27 +908,19 @@ export function Quiz() {
   }
 
   function next() {
-    if (index < questions.length - 1) {
+    if (index < visibleQuestions.length - 1) {
       setIndex(index + 1);
       window.scrollTo(0, 0);
       return;
     }
 
-    const total = Object.values(answers).reduce(
-      (sum, value) => sum + value,
-      0
-    );
-
-    const domainScores = {};
-    domains.forEach((domain) => {
-      domainScores[domain] = questions
-        .filter((q) => q.domain === domain)
-        .reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
-    });
-
     const result = {
-      score: total,
-      domainScores,
+      questionnaire: questionnaireTitle,
+      version: questionnaireVersion,
+      answers,
+      completedCount: visibleQuestions.filter((item) =>
+        isAnswerComplete(item, answers[item.id])
+      ).length,
       date: new Date().toLocaleDateString('en-AU', {
         day: '2-digit',
         month: 'short',
@@ -938,8 +936,8 @@ export function Quiz() {
       JSON.stringify([
         {
           date: result.date,
-          score: total,
-          label: riskFor(total).label
+          completedCount: result.completedCount,
+          label: 'Completed'
         },
         ...history
       ])
@@ -949,7 +947,31 @@ export function Quiz() {
     nav('/results');
   }
 
-  const progressPercent = ((index + 1) / questions.length) * 100;
+  const progressPercent = ((index + 1) / visibleQuestions.length) * 100;
+
+  function selectRadio(value) {
+    setAnswers((previous) => ({ ...previous, [question.id]: value }));
+  }
+
+  function toggleCheckbox(value) {
+    setAnswers((previous) => {
+      const current = Array.isArray(previous[question.id]) ? previous[question.id] : [];
+      let nextValues;
+
+      if (question.exclusiveOption && value === question.exclusiveOption) {
+        nextValues = current.includes(value) ? [] : [value];
+      } else {
+        const withoutExclusive = question.exclusiveOption
+          ? current.filter((item) => item !== question.exclusiveOption)
+          : current;
+        nextValues = withoutExclusive.includes(value)
+          ? withoutExclusive.filter((item) => item !== value)
+          : [...withoutExclusive, value];
+      }
+
+      return { ...previous, [question.id]: nextValues };
+    });
+  }
 
   return (
     <div className="quiz-page">
@@ -958,7 +980,7 @@ export function Quiz() {
           <Logo />
 
           <div className="quiz-meta-step">
-            <strong>Question {index + 1} of {questions.length}</strong>
+            <strong>Item {index + 1} of {visibleQuestions.length}</strong>
             <span>{question.domain}</span>
           </div>
         </div>
@@ -975,39 +997,61 @@ export function Quiz() {
         <div className="quiz-prompt-wrap">
           <span className="domain-pill">{question.domain}</span>
           <h1>{question.text}</h1>
-          <p>Over the past two weeks, choose the option that most accurately reflects your experience.</p>
+          <p>{question.prompt || (question.required === false
+            ? 'This item is optional. Choose any relevant answer or continue.'
+            : 'Choose the response that best reflects your experience.')}</p>
         </div>
 
         <fieldset className="quiz-options-group">
           <legend className="sr-only">{question.text}</legend>
 
-          {options.map((option) => {
+          {(question.type === 'text' || question.type === 'email') && (
+            <label className="quiz-text-field">
+              <span>{question.type === 'email' ? 'Email address' : 'Your response'}</span>
+              <input
+                type={question.type}
+                value={selected || ''}
+                placeholder={question.placeholder || ''}
+                onChange={(event) =>
+                  setAnswers({ ...answers, [question.id]: event.target.value })
+                }
+                autoFocus
+              />
+            </label>
+          )}
+
+          {question.type === 'radio' && question.options.map((option) => {
             const isSelected = selected === option.value;
             return (
-              <label
-                className={`quiz-option-card ${isSelected ? 'selected' : ''}`}
-                key={option.value}
-                onClick={() =>
-                  setAnswers({ ...answers, [question.id]: option.value })
-                }
-              >
+              <label className={`quiz-option-card ${isSelected ? 'selected' : ''}`} key={option.value}>
                 <div className="quiz-option-left">
-                  <span className="quiz-radio-indicator">
-                    <span className="quiz-radio-dot" />
-                  </span>
+                  <span className="quiz-radio-indicator"><span className="quiz-radio-dot" /></span>
                   <span className="quiz-option-label">{option.label}</span>
                 </div>
-
-                <span className="quiz-option-shortcut">Key {option.value}</span>
-
                 <input
                   type="radio"
-                  name="quiz-answer"
+                  name={`quiz-answer-${question.id}`}
                   className="sr-only"
                   checked={isSelected}
-                  onChange={() =>
-                    setAnswers({ ...answers, [question.id]: option.value })
-                  }
+                  onChange={() => selectRadio(option.value)}
+                />
+              </label>
+            );
+          })}
+
+          {question.type === 'checkbox' && question.options.map((option) => {
+            const checked = Array.isArray(selected) && selected.includes(option.value);
+            return (
+              <label className={`quiz-option-card ${checked ? 'selected' : ''}`} key={option.value}>
+                <div className="quiz-option-left">
+                  <span className="quiz-checkbox-indicator">{checked && <CheckCircle2 size={16} />}</span>
+                  <span className="quiz-option-label">{option.label}</span>
+                </div>
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={checked}
+                  onChange={() => toggleCheckbox(option.value)}
                 />
               </label>
             );
@@ -1039,10 +1083,10 @@ export function Quiz() {
           <button
             type="button"
             className="button large"
-            disabled={selected === undefined}
+            disabled={!answerComplete}
             onClick={next}
           >
-            {index === questions.length - 1 ? 'View My Report' : 'Next Question'}
+            {index === visibleQuestions.length - 1 ? 'View Response Summary' : 'Next'}
             <ArrowRight size={18} />
           </button>
         </div>
@@ -1091,59 +1135,41 @@ export function Results() {
 
   const latest =
     JSON.parse(localStorage.getItem('wbc-latest') || 'null') || {
-      score: 58,
-      date: '02 May 2026',
-      domainScores: {
-        'Emotional Health': 12,
-        'Stress & Anxiety': 15,
-        'Sleep & Energy': 11,
-        'Social Connection': 9,
-        'Daily Functioning': 11
-      }
+      questionnaire: questionnaireTitle,
+      version: questionnaireVersion,
+      date: 'Not yet completed',
+      answers: {},
+      completedCount: 0
     };
 
-  const risk = riskFor(latest.score);
-
-  const maxByDomain = {
-    'Emotional Health': 24,
-    'Stress & Anxiety': 24,
-    'Sleep & Energy': 20,
-    'Social Connection': 20,
-    'Daily Functioning': 20
-  };
-
-  // Calculate circular stroke offset
-  const circumference = 2 * Math.PI * 65; // ~408.4
-  const strokePercent = (latest.score / 108) * circumference;
-  const strokeOffset = circumference - strokePercent;
+  const resultSections = assessmentSections.filter(
+    (section) => section.category === 'assessment'
+  );
 
   function download() {
     const lines = [
       `==================================================`,
-      ` WELLBEINGCHECK — CONFIDENTIAL SCREENING REPORT`,
+      ` TUNE IN — PRIVATE RESPONSE SUMMARY`,
       `==================================================`,
       `Date Completed: ${latest.date}`,
-      `Overall Score:  ${latest.score} / 108`,
-      `Status Tier:    ${risk.label}`,
-      `Clinical Note:  ${risk.message}`,
+      `Questionnaire:  ${latest.questionnaire || questionnaireTitle}`,
+      `Version:        ${latest.version || questionnaireVersion}`,
       ``,
-      `DOMAIN BREAKDOWN:`,
+      `IMPORTANT SCORING NOTE:`,
       `--------------------------------------------------`,
-      ...domains.map((domain) => {
-        const score = latest.domainScores[domain] ?? 0;
-        const max = maxByDomain[domain];
-        return `• ${domain.padEnd(20)}: ${score} / ${max} (${Math.round((score / max) * 100)}%)`;
-      }),
+      `This prototype records responses but does not calculate a clinical`,
+      `score. Official company-approved scoring rules must be implemented`,
+      `before automated interpretation is enabled.`,
       ``,
-      `RECOMMENDED NEXT STEPS:`,
-      `--------------------------------------------------`,
-      `1. Review areas with higher relative scores.`,
-      `2. Discuss any recurring fatigue or stress with a GP or qualified counselor.`,
-      `3. Practice intentional micro-breaks and boundary setting during service.`,
-      ``,
-      `IMPORTANT NOTICE:`,
-      `This report is an evidence-informed screening tool for self-reflection`,
-      `and does NOT replace a clinical diagnosis by a healthcare practitioner.`,
+      ...resultSections.flatMap((section) => [
+        section.title.toUpperCase(),
+        `--------------------------------------------------`,
+        ...section.questions.map((question) =>
+          `• ${question.text}\n  ${getAnswerLabel(question, latest.answers?.[question.id])}`
+        ),
+        ``
+      ]),
+      `This response summary is for self-reflection and is not a diagnosis.`,
       `==================================================`
     ];
 
@@ -1151,7 +1177,7 @@ export function Results() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `WellBeingCheck-Report-${latest.date.replace(/\s+/g, '-')}.txt`;
+    link.download = `Tune-In-Response-Summary-${latest.date.replace(/\s+/g, '-')}.txt`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -1184,7 +1210,7 @@ export function Results() {
             <span className="eyebrow">
               <Sparkles size={15} /> Screening Complete
             </span>
-            <h1>Your Wellbeing Snapshot</h1>
+            <h1>Your Response Summary</h1>
             <p>Assessment completed on {latest.date} · Private & confidential</p>
           </div>
 
@@ -1198,110 +1224,51 @@ export function Results() {
           </div>
         </div>
 
-        {/* Main Summary Card */}
+        {/* Completion Summary */}
         <section className="results-summary-card">
           <div className="score-visual-col">
-            <div className="score-visual-wheel">
-              <svg viewBox="0 0 160 160">
-                <circle
-                  className="bg-ring"
-                  cx="80"
-                  cy="80"
-                  r="65"
-                  strokeWidth="12"
-                  fill="none"
-                />
-                <circle
-                  className="score-ring-bar"
-                  cx="80"
-                  cy="80"
-                  r="65"
-                  strokeWidth="12"
-                  fill="none"
-                  stroke={
-                    latest.score <= 35
-                      ? 'var(--status-safe-text)'
-                      : latest.score <= 70
-                      ? 'var(--status-watch-text)'
-                      : 'var(--status-risk-text)'
-                  }
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeOffset}
-                />
-              </svg>
-              <div className="score-wheel-text">
-                <strong>{latest.score}</strong>
-                <span>/ 108</span>
-              </div>
+            <div className="completion-mark" aria-hidden="true">
+              <CheckCircle2 size={64} />
             </div>
-
-            <span className={`status ${risk.className}`}>
-              {risk.label}
-            </span>
+            <span className="status safe">Completed</span>
           </div>
 
           <div className="results-narrative-col">
-            <h2>Overall Result & Interpretation</h2>
-            <p>{risk.message}</p>
+            <h2>Your responses have been recorded</h2>
+            <p>
+              This prototype provides a private response summary for the official company
+              questionnaire. It does not currently calculate or interpret a clinical score.
+            </p>
             <p style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>
-              Scores below 36 indicate balanced wellbeing, 36–70 suggest areas that may benefit from
-              extra care or conversation, and 71+ suggest connecting with professional support soon.
+              Company-approved scoring formulas must be supplied and reviewed before automated
+              results or risk labels are enabled.
             </p>
           </div>
         </section>
 
-        {/* 5 Domain Breakdown Section */}
+        {/* Response Summary */}
         <section className="domain-breakdown-section">
           <div>
-            <h2>Domain Breakdown</h2>
+            <h2>Response Summary</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
-              Detailed review of your responses across the five core dimensions of wellbeing:
+              Review the responses recorded for each company questionnaire section.
             </p>
           </div>
 
-          <div className="domain-bars-list">
-            {domains.map((domain) => {
-              const score = latest.domainScores[domain] ?? 0;
-              const max = maxByDomain[domain];
-              const pct = Math.round((score / max) * 100);
-
-              let domainStatus = 'Balanced';
-              let barColor = 'var(--brand-forest)';
-
-              if (pct > 65) {
-                domainStatus = 'Attention Recommended';
-                barColor = 'var(--brand-terracotta)';
-              } else if (pct > 35) {
-                domainStatus = 'Moderate Concern';
-                barColor = 'var(--brand-amber)';
-              }
-
-              return (
-                <div className="domain-bar-row" key={domain}>
-                  <div className="domain-bar-head">
-                    <div>
-                      <strong>{domain}</strong>
-                      <span style={{ marginLeft: '10px', fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                        ({domainStatus})
-                      </span>
+          <div className="response-sections-list">
+            {resultSections.map((section) => (
+              <details className="response-section" key={section.id}>
+                <summary>{section.title}</summary>
+                <div className="response-items">
+                  {section.questions.map((question) => (
+                    <div className="response-item" key={question.id}>
+                      <strong>{question.text}</strong>
+                      <span>{getAnswerLabel(question, latest.answers?.[question.id])}</span>
                     </div>
-                    <span>
-                      {score} / {max} ({pct}%)
-                    </span>
-                  </div>
-
-                  <div className="domain-bar-track">
-                    <div
-                      className="domain-bar-fill"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: barColor
-                      }}
-                    />
-                  </div>
+                  ))}
                 </div>
-              );
-            })}
+              </details>
+            ))}
           </div>
         </section>
 
@@ -1391,20 +1358,20 @@ export function AboutScreening() {
           </p>
 
           <section className="info-section">
-            <h2>The Science Behind the 27 Questions</h2>
+            <h2>The Company Questionnaire</h2>
             <p>
-              Our assessment draws from validated psychometric screening tools including standard
-              measures for mood, generalized anxiety, sleep disruption, and social support. It
-              condenses multi-dimensional indicators into a brief, non-intrusive 8-minute experience.
+              This prototype presents the Centre for Effective Serving’s Tune In Emotional Health
+              Check for ministry workers. It covers general wellbeing, attention, mood, anxiety,
+              burnout, rest, spiritual wellbeing, support, relationships and physical wellbeing.
             </p>
           </section>
 
           <section className="info-section">
-            <h2>The Five Dimensions</h2>
+            <h2>Whole-Person Coverage</h2>
             <p>
-              Wellbeing is dynamic and multifaceted. Rather than a binary "healthy / not healthy"
-              label, our report breaks down Emotional Health, Stress & Anxiety, Sleep & Energy, Social
-              Connection, and Daily Functioning.
+              Wellbeing is dynamic and multifaceted. The company questionnaire considers general
+              wellbeing, attention, mood, anxiety, burnout, rest, spirituality, support,
+              relationships and physical wellbeing.
             </p>
           </section>
 
@@ -1429,7 +1396,7 @@ export function FAQs() {
   const faqItems = [
     {
       q: 'How long does the assessment take to complete?',
-      a: 'The assessment contains 27 straightforward questions and typically takes about 6 to 8 minutes in a quiet setting.'
+      a: 'The company questionnaire contains 14 main sections and typically takes about 10 minutes in a quiet setting.'
     },
     {
       q: 'Is WellBeingCheck a formal clinical diagnosis?',
@@ -1441,15 +1408,15 @@ export function FAQs() {
     },
     {
       q: 'Where are my answers and results stored?',
-      a: 'In this browser application, your answers and calculated reports are saved locally on your device. Your data is not sold or tracked by third parties.'
+      a: 'In this browser application, your answers and response summaries are saved locally on your device. Your data is not sold or tracked by third parties.'
     },
     {
       q: 'Can I share or print my results?',
       a: 'Yes! On the results page, you can click "Download Report" to save a comprehensive text file, or click "Print" to print a clean summary for your doctor.'
     },
     {
-      q: 'What should I do if my score indicates elevated risk?',
-      a: 'Take a breath—an elevated score is an invitation to prioritize yourself. We provide practical guidance and recommend reaching out to your doctor or a free 24/7 hotline like Lifeline (13 11 14).'
+      q: 'Why does the prototype not show a clinical score?',
+      a: 'The official company scoring formulas were not included with the questionnaire. The prototype records a private response summary and will only calculate results after approved scoring rules are supplied.'
     }
   ];
 
@@ -1462,8 +1429,8 @@ export function FAQs() {
           <span className="info-eyebrow">Help & Guidance</span>
           <h1>Frequently Asked Questions</h1>
           <p className="info-lead">
-            Common questions about WellBeingCheck, how results are calculated, and how to make the
-            most of your screening report.
+            Common questions about WellBeingCheck, the company questionnaire, and your private
+            response summary.
           </p>
 
           <div className="faq-list">

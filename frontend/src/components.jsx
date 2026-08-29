@@ -140,8 +140,8 @@ const resourceContent = {
         <details open>
           <summary>How long does the assessment take?</summary>
           <p>
-            The assessment consists of 27 straightforward questions and typically
-            takes between 6 to 8 minutes to complete in a calm environment.
+            The company questionnaire contains 14 main sections and typically
+            takes about 10 minutes to complete in a calm environment.
           </p>
         </details>
 
@@ -164,17 +164,17 @@ const resourceContent = {
         <details>
           <summary>Can I download and share my summary report?</summary>
           <p>
-            Yes. Upon completing your assessment, you receive a full domain breakdown that
-            you can download as a report to discuss with your healthcare professional.
+            Yes. Upon completing your assessment, you receive a private response summary that
+            you can download or discuss with a trusted support person or healthcare professional.
           </p>
         </details>
 
         <details>
-          <summary>What should I do if my score indicates elevated risk?</summary>
+          <summary>Why does the prototype not show a clinical score?</summary>
           <p>
-            Elevated scores simply mean that seeking an extra hand would be beneficial.
-            We provide practical self-care steps, and recommend reaching out to your GP,
-            counselor, or 24/7 support lines like Lifeline (13 11 14).
+            The official company scoring formulas were not included with the questionnaire.
+            This prototype records a response summary and will only calculate results after
+            company-approved scoring rules are supplied.
           </p>
         </details>
       </div>
@@ -417,12 +417,12 @@ export const featureData = [
   [
     FileText,
     'Immediate Insights',
-    'Get a clear, plain-language breakdown across 5 vital dimensions the moment you finish.'
+    'Get a clear, private response summary organised by the company questionnaire sections.'
   ],
   [
     ListChecks,
-    '27-Point Evidence Screen',
-    'A structured, clinically grounded set of questions covering mood, sleep, stress, and connection.'
+    'Official Company Questionnaire',
+    'The multi-section Tune In check covers emotional, spiritual, relational and ministry wellbeing.'
   ],
   [
     ChartNoAxesCombined,

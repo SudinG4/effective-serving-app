@@ -63,34 +63,42 @@ export const assessmentSections = [
     includeInResults: false,
     questions: [
       {
+        id: 'profile_name', type: 'text',
+        text: 'Name', placeholder: 'Enter your full name', required: true
+      },
+      {
+        id: 'profile_email', type: 'email',
+        text: 'Email address', placeholder: 'you@example.com', required: true
+      },
+      {
         id: 'profile_ministry_position', type: 'text',
-        text: 'What is your ministry position?', placeholder: 'Enter your role or position', required: true
+        text: 'Ministry position', placeholder: 'Enter your role or position', required: true
       },
       {
         id: 'profile_send_copy', type: 'radio',
-        text: 'Would you like your results sent to someone else, too?',
+        text: 'Would you like your results sent to someone else too?',
         options: yesNoOptions, required: true
       },
       {
         id: 'profile_recipient_name', type: 'text',
-        text: 'What is the name of the person who should receive a copy?',
+        text: "Recipient's name",
         placeholder: 'Recipient name', required: true,
         showWhen: { questionId: 'profile_send_copy', equals: 'yes' }
       },
       {
         id: 'profile_recipient_email', type: 'email',
-        text: 'What is their email address?', placeholder: 'recipient@example.com', required: true,
+        text: "Recipient's email address", placeholder: 'recipient@example.com', required: true,
         showWhen: { questionId: 'profile_send_copy', equals: 'yes' }
       },
       {
         id: 'profile_recipient_relationship', type: 'text',
-        text: 'What is their relationship to you?',
+        text: 'Relationship to you',
         placeholder: 'For example: supervisor, mentor or partner', required: true,
         showWhen: { questionId: 'profile_send_copy', equals: 'yes' }
       },
       {
         id: 'profile_mailing_consent', type: 'radio',
-        text: 'Do you consent to being subscribed to the Centre for Effective Serving mailing list?',
+        text: 'Do you consent to joining the Centre for Effective Serving mailing list?',
         options: yesNoOptions, required: true
       }
     ]
@@ -98,7 +106,7 @@ export const assessmentSections = [
   matrixSection({
     id: 'q1', title: '1. General Happiness', shortTitle: 'General Happiness',
     prompt: 'During the past month, how often did you feel…', options: monthlyFrequency,
-    items: ['Happy', 'Interested in life', 'Satisfied with life']
+    items: ['Happy?', 'Interested in life?', 'Satisfied with life?']
   }),
   matrixSection({
     id: 'q1a', title: '1a. General Wellbeing', shortTitle: 'General Wellbeing',
@@ -107,26 +115,26 @@ export const assessmentSections = [
     items: [
       'That you had something important to contribute to society',
       'That you belonged to a community',
-      'That our society is a good place, becoming a better place, for all people',
+      'That society is a good place and is becoming better for all people?',
       'That people are basically good',
-      'That the way our society works makes sense to you',
+      'That the way society works makes sense to you?',
       'That you liked most parts of your daily life',
       'Good at managing the responsibilities of your daily life',
       'That you had experiences that challenged you to grow and become a better person',
       'Confident to think or express your own ideas or opinions',
       'That your life has a sense of direction or meaning to it',
-      'That you had warm and trusting relationships with others'
+      'That you had warm and trusting relationships with others?'
     ]
   }),
   matrixSection({
     id: 'q2', title: '2. Attention and Awareness', shortTitle: 'Attention & Awareness',
     prompt: 'For each item, rate how much it described your experience recently.', options: experienceScale,
     items: [
-      'I was finding it difficult to stay focused on what was happening',
-      'I was doing something without paying attention',
+      'I found it difficult to stay focused on what was happening.',
+      'I did something without paying attention.',
       'I was preoccupied with the future or the past',
-      'I was doing something automatically, without being aware of what I was doing',
-      'I was rushing through something without being really attentive to it'
+      'I did something automatically without being aware of what I was doing.',
+      'I rushed through something without being genuinely attentive to it.'
     ]
   }),
   matrixSection({
@@ -134,8 +142,8 @@ export const assessmentSections = [
     prompt: 'Rate the following statements as they apply to you.', options: agreementScale,
     items: [
       'It is important to me to try to understand what my feelings mean',
-      'Thinking about my thoughts makes me more confused',
-      'I often find it difficult to make sense of the way I feel about things'
+      'Thinking about my thoughts makes me more confused.',
+      'I often find it difficult to understand how I feel about things.'
     ]
   }),
   matrixSection({
@@ -143,14 +151,14 @@ export const assessmentSections = [
     prompt: 'Over the last 2 weeks, how often have you been bothered by the following problem?',
     options: twoWeekFrequency,
     items: [
-      'Little interest or pleasure in doing things',
-      'Feeling down, depressed, irritable or hopeless',
-      'Trouble falling or staying asleep, or sleeping too much',
+      'Having little interest or pleasure in doing things?',
+      'Feeling down, depressed, irritable or hopeless?',
+      'Having trouble falling asleep, staying asleep or sleeping too much?',
       'Feeling tired or having little energy',
       'Poor appetite or overeating',
       'Feeling bad about yourself',
-      'Trouble concentrating on things, such as work, reading or watching television',
-      'Moving or speaking so slowly that other people could have noticed, or being so fidgety or restless that you have been moving around much more than usual'
+      'Having trouble concentrating on schoolwork, reading or watching television?',
+      'Moving or speaking unusually slowly - or being unusually fidgety or restless?'
     ]
   }),
   matrixSection({
@@ -159,12 +167,12 @@ export const assessmentSections = [
     options: twoWeekFrequency,
     items: [
       'Feeling nervous, anxious, or on edge',
-      'Not being able to stop or control worrying',
+      'Being unable to stop or control worrying?',
       'Worrying too much about different things',
       'Trouble relaxing',
-      'Being so restless that it is hard to sit still',
+      'Being so restless that it is difficult to sit still?',
       'Becoming easily annoyed or irritable',
-      'Feeling afraid, as if something awful might happen'
+      'Feeling afraid as though something awful might happen?'
     ]
   }),
   matrixSection({
@@ -181,12 +189,12 @@ export const assessmentSections = [
     id: 'q7', title: '7. Distressing Events', shortTitle: 'Distressing Events', category: 'assessment',
     questions: [{
       id: 'q7', type: 'radio', required: true, options: yesNoOptions,
-      text: 'There are distressing events, arising from ministry and/or personal life, that are significantly affecting my ability to sleep and to function effectively in daily life and ministry.'
+      text: 'Are there distressing events arising from your ministry or personal life that significantly affect your ability to sleep and function effectively in daily life and ministry?'
     }]
   },
   checklistSection({
     id: 'q8', title: '8. Difficult Ministry Experiences', shortTitle: 'Difficult Experiences',
-    prompt: 'Select any experiences that have applied to you in your ministry role during the last 12 months and are still causing you distress. Continue without selecting if none apply.',
+    prompt: 'Select any experiences that occurred during your ministry role in the last 12 months and are still causing you distress:',
     required: false,
     options: ['Sexual harassment', 'Threats of violence', 'Physical bullying', 'Unpleasant teasing', 'Conflicts and quarrels', 'Gossip and slander']
   }),
@@ -195,10 +203,10 @@ export const assessmentSections = [
     prompt: 'Select as many statements as you agree with.',
     options: [
       'I have a wind-down period each day where I prepare myself for restful sleep',
-      'I have already scheduled time off from ministry duties, including leave and retreats, to rest and recharge',
-      'I engage in hobbies or relaxation activities as part of my daily routine',
-      'I check in with family, friends, or my team to ensure they are also getting adequate rest',
-      'I take regular breaks during the week, including a full day off from texts, emails, and work or ministry access',
+      'I have scheduled time away from ministry duties, including leave and retreats, to rest and recharge.',
+      'I include hobbies or relaxation activities in my daily routine.',
+      'I check on family, friends or team members to ensure they receive adequate rest.',
+      'I take regular breaks, including a full day away from texts, emails and ministry work.',
       'None of these apply to me'
     ]
   }),
@@ -218,11 +226,11 @@ export const assessmentSections = [
     id: 'q11', title: '11. Support and Workload Management', shortTitle: 'Support & Workload',
     prompt: 'Select as many statements as you agree with.',
     options: [
-      'I have someone with whom I regularly confess my fallings and failings',
+      'I have someone with whom I regularly confess my failings.',
       'I make time to regularly assess and adjust the sustainability of my work practices and commitments',
       'I recognise my own limitations and seek support when I need it',
-      'I can easily prioritise and manage competing demands in ministry through effective time management and planning',
-      'I have a way to seek helpful input for ministry issues that arise',
+      'I effectively prioritise and manage competing ministry demands.',
+      'I have a way to obtain helpful advice about ministry issues.',
       'None of these apply to me'
     ]
   }),
@@ -256,7 +264,7 @@ export const assessmentSections = [
     options: [
       'I exercise at least three times a week',
       'I eat in a way that supports both my physical and mental health',
-      'I get at least 8 hours of uninterrupted, restful sleep each night',
+      'I receive at least eight hours of uninterrupted, restful sleep each night.',
       'I keep up with necessary medical or health appointments and do not delay care',
       'I am able to maintain stable energy and focus throughout the week without relying on stimulants or sugar',
       'None of these apply to me'
@@ -268,27 +276,27 @@ export const assessmentSections = [
     questions: [
       {
         id: 'research_resign_current', type: 'radio', required: false, options: yesNoOptions,
-        text: 'In the last 12 months, have you seriously considered resigning from your current ministry?'
+        text: 'During the last 12 months, have you seriously considered resigning from your current ministry?'
       },
       {
         id: 'research_resign_ministry', type: 'radio', required: false, options: yesNoOptions,
-        text: 'In the last 12 months, have you seriously considered resigning from ministry altogether?'
+        text: 'During the last 12 months, have you seriously considered leaving ministry altogether?'
       },
       {
         id: 'research_leave_reasons', type: 'checkbox', required: false,
-        text: 'Select any reasons why you would leave ministry.',
+        text: 'Why would you leave ministry?',
         options: [
-          { label: 'I feel lonely and isolated', value: 'lonely' },
-          { label: 'Immense stress of the job', value: 'stress' },
-          { label: 'Impact on family', value: 'family' },
+          { label: 'Loneliness and isolation', value: 'lonely' },
+          { label: 'Immense job-related stress', value: 'stress' },
+          { label: 'Effects on family', value: 'family' },
           { label: 'Church conflict', value: 'conflict' },
-          { label: 'Leadership challenge with staff and teams', value: 'leadership' },
+          { label: 'Leadership challenges involving staff and teams', value: 'leadership' },
           { label: 'Other', value: 'other' }
         ]
       },
       {
         id: 'research_leave_other', type: 'text', required: true,
-        text: 'If you selected “Other”, please elaborate.', placeholder: 'Please describe the other reason',
+        text: "If you selected 'Other,' please explain.", placeholder: 'Please describe the other reason',
         showWhen: { questionId: 'research_leave_reasons', includes: 'other' }
       }
     ]

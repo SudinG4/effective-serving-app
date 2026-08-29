@@ -1,3 +1,4 @@
+
 import { supabase } from '../config/supabase.js';
 
 export async function register(req, res) {
@@ -10,6 +11,7 @@ export async function register(req, res) {
       password
     } = req.body;
 
+    // Validate required fields
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -17,6 +19,7 @@ export async function register(req, res) {
       });
     }
 
+    // Validate password
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
@@ -24,8 +27,11 @@ export async function register(req, res) {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Create user with Supabase Auth
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       password,
       options: {
         data: {
@@ -37,6 +43,8 @@ export async function register(req, res) {
     });
 
     if (error) {
+      console.error('Registration error:', error);
+
       return res.status(400).json({
         success: false,
         message: error.message
@@ -63,6 +71,7 @@ export async function login(req, res) {
   try {
     const { email, password } = req.body;
 
+    // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -70,15 +79,20 @@ export async function login(req, res) {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Authenticate user with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       password
     });
 
     if (error) {
+      console.error('Login error:', error);
+
       return res.status(401).json({
         success: false,
-        message: error.message
+        message: 'Invalid email or password.'
       });
     }
 
@@ -97,3 +111,4 @@ export async function login(req, res) {
     });
   }
 }
+

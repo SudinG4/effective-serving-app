@@ -15,9 +15,13 @@ import {
 import About from './screens/about';
 
 function ProtectedRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem('wbc-user') || 'null');
+  const user = JSON.parse(
+    localStorage.getItem('wbc-user') || 'null'
+  );
 
-  if (!user) {
+  const accessToken = localStorage.getItem('wbc-access-token');
+
+  if (!user || !accessToken) {
     return <Navigate to="/login" replace />;
   }
 
@@ -32,10 +36,22 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      <Route path="/about-screening" element={<AboutScreening />} />
+      <Route
+        path="/about-screening"
+        element={<AboutScreening />}
+      />
+
       <Route path="/faqs" element={<FAQs />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<Terms />} />
+
+      <Route
+        path="/privacy"
+        element={<PrivacyPolicy />}
+      />
+
+      <Route
+        path="/terms"
+        element={<Terms />}
+      />
 
       <Route
         path="/dashboard"
@@ -64,8 +80,29 @@ export default function App() {
         }
       />
 
-      <Route path="/404" element={<NotFound />} />
-      <Route path="*" element={<Navigate to="/404" replace />} />
+      <Route
+        path="/results/:id"
+        element={
+          <ProtectedRoute>
+            <Results />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/404"
+        element={<NotFound />}
+      />
+
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/404"
+            replace
+          />
+        }
+      />
     </Routes>
   );
 }

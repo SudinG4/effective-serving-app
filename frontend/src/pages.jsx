@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import {
 
@@ -52,8 +52,6 @@ import {
 
   domains,
 
-  initialHistory,
-
   options,
 
   questions,
@@ -63,9 +61,11 @@ import {
 } from './data';
 
 const API_BASE_URL =
+
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 const storage = {
+
   getUser: () =>
     JSON.parse(localStorage.getItem('wbc-user') || 'null'),
 
@@ -81,28 +81,29 @@ const storage = {
   clearAuth: () => {
     localStorage.removeItem('wbc-user');
     localStorage.removeItem('wbc-access-token');
-
-    // Remove the old prototype account record if it exists.
     localStorage.removeItem('wbc-account');
-  },
+  }
 
-  getHistory: () =>
-    JSON.parse(
-      localStorage.getItem('wbc-history') ||
-        JSON.stringify(initialHistory)
-    )
 };
 
 function profileFromSupabaseUser(user) {
+
   const metadata = user?.user_metadata || {};
 
   return {
+
     id: user?.id || '',
+
     firstName: metadata.first_name || '',
+
     lastName: metadata.last_name || '',
+
     email: user?.email || '',
+
     phone: metadata.phone || ''
+
   };
+
 }
 
 export function Home() {
@@ -270,292 +271,503 @@ export function Home() {
 }
 
 function AuthShell({ signup = false }) {
+
   const nav = useNavigate();
 
   const [form, setForm] = useState({
+
     firstName: '',
+
     lastName: '',
+
     email: '',
+
     phone: '',
+
     password: ''
+
   });
 
   const [error, setError] = useState('');
+
   const [status, setStatus] = useState('');
+
   const [loading, setLoading] = useState(false);
 
   async function submit(e) {
+
     e.preventDefault();
+
     setError('');
+
     setStatus('');
 
     const email = form.email.trim().toLowerCase();
 
     if (signup) {
+
       if (form.firstName.trim().length < 2) {
+
         setError('Please enter your first name.');
+
         return;
+
       }
 
       if (form.lastName.trim().length < 2) {
+
         setError('Please enter your last name.');
+
         return;
+
       }
 
       if (!/^\S+@\S+\.\S+$/.test(email)) {
+
         setError('Please enter a valid email address.');
+
         return;
+
       }
 
       if (form.phone.trim().length < 8) {
+
         setError('Please enter a valid contact number.');
+
         return;
+
       }
 
       if (form.password.length < 6) {
+
         setError('Password must contain at least 6 characters.');
+
         return;
+
       }
+
     } else {
+
       if (!/^\S+@\S+\.\S+$/.test(email)) {
+
         setError('Please enter a valid email address.');
+
         return;
+
       }
 
       if (form.password.length < 6) {
+
         setError('Password must contain at least 6 characters.');
+
         return;
+
       }
+
     }
 
     try {
+
       setLoading(true);
 
       const endpoint = signup ? 'register' : 'login';
 
       const payload = signup
+
         ? {
+
             firstName: form.firstName.trim(),
+
             lastName: form.lastName.trim(),
+
             email,
+
             phone: form.phone.trim(),
+
             password: form.password
+
           }
+
         : {
+
             email,
+
             password: form.password
+
           };
 
       const response = await fetch(
+
         `${API_BASE_URL}/api/auth/${endpoint}`,
+
         {
+
           method: 'POST',
+
           headers: {
+
             'Content-Type': 'application/json'
+
           },
+
           body: JSON.stringify(payload)
+
         }
+
       );
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
+
         throw new Error(
+
           data.message ||
+
             (signup
+
               ? 'Unable to create account.'
+
               : 'Unable to log in.')
+
         );
+
       }
 
       if (signup && !data.session) {
+
         setStatus(
+
           'Account created. Check your email and confirm your account, then log in.'
+
         );
 
         setForm((current) => ({
+
           ...current,
+
           password: ''
+
         }));
 
         return;
+
       }
 
       if (!data.user || !data.session?.access_token) {
+
         throw new Error(
+
           'Authentication succeeded but no active session was returned.'
+
         );
+
       }
 
       storage.setUser(profileFromSupabaseUser(data.user));
+
       storage.setAccessToken(data.session.access_token);
 
       nav('/dashboard');
+
     } catch (err) {
+
       setError(
+
         err instanceof Error
+
           ? err.message
+
           : 'Something went wrong. Please try again.'
+
       );
+
     } finally {
+
       setLoading(false);
+
     }
+
   }
 
   return (
+
     <div className="auth-page">
+
       <header className="auth-header">
+
         <Logo />
+
       </header>
 
       <main className="auth-main">
+
         <form className="auth-card" onSubmit={submit}>
+
           <span className="auth-icon">
+
             <HeartPulse />
+
           </span>
 
           <h1>{signup ? 'Create your account' : 'Welcome back'}</h1>
 
           <p>
+
             {signup
+
               ? 'Begin your private wellbeing check.'
+
               : 'Log in to continue your wellbeing screening.'}
+
           </p>
 
           {signup && (
+
             <>
+
               <label>
+
                 First name
+
                 <input
+
                   type="text"
+
                   value={form.firstName}
+
                   onChange={(e) =>
+
                     setForm({
+
                       ...form,
+
                       firstName: e.target.value
+
                     })
+
                   }
+
                   placeholder="First name"
+
                   autoComplete="given-name"
+
                   disabled={loading}
+
                 />
+
               </label>
 
               <label>
+
                 Last name
+
                 <input
+
                   type="text"
+
                   value={form.lastName}
+
                   onChange={(e) =>
+
                     setForm({
+
                       ...form,
+
                       lastName: e.target.value
+
                     })
+
                   }
+
                   placeholder="Last name"
+
                   autoComplete="family-name"
+
                   disabled={loading}
+
                 />
+
               </label>
 
               <label>
+
                 Contact number
+
                 <input
+
                   type="tel"
+
                   value={form.phone}
+
                   onChange={(e) =>
+
                     setForm({
+
                       ...form,
+
                       phone: e.target.value
+
                     })
+
                   }
+
                   placeholder="04XX XXX XXX"
+
                   autoComplete="tel"
+
                   disabled={loading}
+
                 />
+
               </label>
+
             </>
+
           )}
 
           <label>
+
             Email
+
             <input
+
               type="email"
+
               value={form.email}
+
               onChange={(e) =>
+
                 setForm({
+
                   ...form,
+
                   email: e.target.value
+
                 })
+
               }
+
               placeholder="you@example.com"
+
               autoComplete="email"
+
               disabled={loading}
+
             />
+
           </label>
 
           <label>
+
             Password
+
             <input
+
               type="password"
+
               value={form.password}
+
               onChange={(e) =>
+
                 setForm({
+
                   ...form,
+
                   password: e.target.value
+
                 })
+
               }
+
               placeholder="••••••••"
+
               autoComplete={
+
                 signup ? 'new-password' : 'current-password'
+
               }
+
               disabled={loading}
+
             />
+
           </label>
 
           {error && <p className="form-error">{error}</p>}
 
           {status && (
+
             <p className="prototype">
+
               {status}
+
             </p>
+
           )}
 
           <button
+
             className="button full"
+
             type="submit"
+
             disabled={loading}
+
           >
+
             {loading
+
               ? signup
+
                 ? 'Creating Account...'
+
                 : 'Logging In...'
+
               : signup
+
                 ? 'Create Account'
+
                 : 'Continue'}
+
             <ArrowRight size={18} />
+
           </button>
 
           <p className="switch">
+
             {signup
+
               ? 'Already have an account?'
+
               : 'Don’t have an account?'}
 
             {' '}
 
             <Link to={signup ? '/login' : '/signup'}>
+
               {signup ? 'Log in' : 'Sign up'}
+
             </Link>
+
           </p>
 
           <p className="prototype">
+
             Authentication is handled by Supabase. Assessment
+
             results are still stored locally in this browser demo.
+
           </p>
+
         </form>
+
       </main>
+
     </div>
+
   );
+
 }
 
 export function Login() {
@@ -576,7 +788,90 @@ export function Dashboard() {
 
   const user = storage.getUser();
 
-  const history = storage.getHistory();
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAssessments() {
+      const accessToken = storage.getAccessToken();
+
+      if (!accessToken) {
+        storage.clearAuth();
+        nav('/login');
+        return;
+      }
+
+      try {
+        setLoadingHistory(true);
+        setHistoryError('');
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/assessments`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+          storage.clearAuth();
+          nav('/login');
+          return;
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.message || 'Unable to load assessment history.'
+          );
+        }
+
+        if (!cancelled) {
+          const mappedHistory = (data.assessments || []).map(
+            (assessment) => ({
+              id: assessment.id,
+              date: new Date(
+                assessment.completed_at
+              ).toLocaleDateString('en-AU', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              }),
+              score: assessment.total_score,
+              label: assessment.risk_level
+            })
+          );
+
+          setHistory(mappedHistory);
+        }
+      } catch (error) {
+        console.error('Load assessment history error:', error);
+
+        if (!cancelled) {
+          setHistoryError(
+            error instanceof Error
+              ? error.message
+              : 'Unable to load assessment history.'
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingHistory(false);
+        }
+      }
+    }
+
+    loadAssessments();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [nav]);
 
   function logout() {
     storage.clearAuth();
@@ -584,233 +879,159 @@ export function Dashboard() {
   }
 
   return (
-
     <>
-
       <header className="dashboard-header">
-
         <div className="shell dash-head">
-
           <Logo />
 
           <div className="welcome">
-
             <h1>Good day, {user?.firstName || 'there'}</h1>
-
             <p>Your private wellbeing dashboard</p>
-
           </div>
 
           <div className="utility">
-
             <button aria-label="Notifications">
-
               <Bell />
-
             </button>
 
             <button aria-label="Help">
-
               <CircleHelp />
-
             </button>
 
             <button aria-label="Settings">
-
               <Settings />
-
             </button>
 
             <button onClick={logout} aria-label="Logout">
-
               Logout
-
             </button>
-
           </div>
-
         </div>
-
       </header>
 
       <main className="dashboard shell">
-
         <section className="start-card">
-
           <div>
-
             <span className="eyebrow">
-
               <Sparkles size={16} />
-
               A moment for you
-
             </span>
 
             <h2>Start Assessment</h2>
 
             <p>
-
               27 questions across 5 domains, about 8 minutes. You’ll get an
-
               instant report at the end.
-
             </p>
 
             <div className="quick-facts">
-
               <span>
-
                 <UsersRound />
-
                 5 domains
-
               </span>
 
               <span>
-
                 <Clock3 />
-
                 ~8 min
-
               </span>
 
               <span>
-
                 <FileText />
-
                 Instant report
-
               </span>
-
             </div>
-
           </div>
 
           <Link className="button" to="/quiz">
-
             Start Assessment <ArrowRight />
-
           </Link>
-
         </section>
 
         <section className="stats">
-
           <article>
-
             <strong>{history.length}</strong>
-
             <span>Assessments Taken</span>
-
           </article>
 
           <article>
-
-            <strong>{Math.max(history.length - 1, 0)}</strong>
-
-            <span>Reports Viewed</span>
-
+            <strong>{history.length}</strong>
+            <span>Reports Available</span>
           </article>
 
           <article>
-
             <strong>
-
               {history.length > 1 &&
-
               history[0].score < history[1].score
-
                 ? 'Improving'
-
                 : 'Keep checking in'}
-
             </strong>
-
             <span>Current Trend</span>
-
           </article>
-
         </section>
 
         <section className="history">
-
           <div className="section-title">
-
             <div>
-
               <h2>Past Results</h2>
-
               <p>Your previous screenings and reports.</p>
-
             </div>
-
           </div>
 
+          {loadingHistory && (
+            <p className="prototype">Loading your assessment history...</p>
+          )}
+
+          {historyError && (
+            <p className="form-error">{historyError}</p>
+          )}
+
+          {!loadingHistory && !historyError && history.length === 0 && (
+            <p className="prototype">
+              No assessments yet. Complete your first assessment to see it here.
+            </p>
+          )}
+
           <div className="result-list">
-
-            {history.map((item, index) => {
-
+            {history.map((item) => {
               const risk = riskFor(item.score);
 
               return (
-
-                <article key={item.date + index}>
-
+                <article key={item.id}>
                   <div>
-
                     <span className="date">{item.date}</span>
 
                     <strong>
-
                       {item.score}
-
                       <small>/ 108</small>
-
                     </strong>
-
                   </div>
 
                   <span className={`status ${risk.className}`}>
-
                     {item.label}
-
                   </span>
 
                   <div className="row-actions">
-
-                    <Link to="/results">View Report</Link>
-
-                    <Link to="/quiz">
-
-                      <RotateCcw />
-
-                      Retake
-
+                    <Link to={`/results/${item.id}`}>
+                      View Report
                     </Link>
 
+                    <Link to="/quiz">
+                      <RotateCcw />
+                      Retake
+                    </Link>
                   </div>
-
                 </article>
-
               );
-
             })}
-
           </div>
-
         </section>
 
         <Disclaimer />
-
       </main>
 
       <BottomNav />
-
       <Footer />
-
     </>
-
   );
 
 }
@@ -826,6 +1047,10 @@ export function Quiz() {
     JSON.parse(sessionStorage.getItem('wbc-answers') || '{}')
 
   );
+
+  const [saving, setSaving] = useState(false);
+
+  const [saveError, setSaveError] = useState('');
 
   const question = questions[index];
 
@@ -863,7 +1088,9 @@ export function Quiz() {
 
   }, [answers]);
 
-  function next() {
+  async function next() {
+
+    setSaveError('');
 
     if (index < questions.length - 1) {
 
@@ -875,87 +1102,95 @@ export function Quiz() {
 
     }
 
-    const total = Object.values(answers).reduce(
+    const accessToken = storage.getAccessToken();
 
-      (sum, value) => sum + value,
+    if (!accessToken) {
 
-      0
+      storage.clearAuth();
 
-    );
+      nav('/login');
 
-    const domainScores = {};
+      return;
 
-    domains.forEach((domain) => {
+    }
 
-      domainScores[domain] = questions
+    try {
 
-        .filter((question) => question.domain === domain)
+      setSaving(true);
 
-        .reduce(
+      const response = await fetch(
 
-          (sum, question) =>
-
-            sum + (answers[question.id] ?? 0),
-
-          0
-
-        );
-
-    });
-
-    const result = {
-
-      score: total,
-
-      domainScores,
-
-      date: new Date().toLocaleDateString('en-AU', {
-
-        day: '2-digit',
-
-        month: 'short',
-
-        year: 'numeric'
-
-      })
-
-    };
-
-    localStorage.setItem(
-
-      'wbc-latest',
-
-      JSON.stringify(result)
-
-    );
-
-    const history = storage.getHistory();
-
-    localStorage.setItem(
-
-      'wbc-history',
-
-      JSON.stringify([
+        `${API_BASE_URL}/api/assessments`,
 
         {
 
-          date: result.date,
+          method: 'POST',
 
-          score: total,
+          headers: {
 
-          label: riskFor(total).label
+            'Content-Type': 'application/json',
 
-        },
+            Authorization: `Bearer ${accessToken}`
 
-        ...history
+          },
 
-      ])
+          body: JSON.stringify({
 
-    );
+            answers
 
-    sessionStorage.removeItem('wbc-answers');
+          })
 
-    nav('/results');
+        }
+
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success || !data.assessment) {
+
+        if (response.status === 401) {
+
+          storage.clearAuth();
+
+          nav('/login');
+
+          return;
+
+        }
+
+        throw new Error(
+
+          data.message || 'Unable to save your assessment.'
+
+        );
+
+      }
+
+      const assessment = data.assessment;
+
+      sessionStorage.removeItem('wbc-answers');
+
+      nav(`/results/${assessment.id}`);
+
+    } catch (error) {
+
+      console.error('Save assessment error:', error);
+
+      setSaveError(
+
+        error instanceof Error
+
+          ? error.message
+
+          : 'Unable to save your assessment. Please try again.'
+
+      );
+
+    } finally {
+
+      setSaving(false);
+
+    }
 
   }
 
@@ -1011,7 +1246,13 @@ export function Quiz() {
 
         </p>
 
-        <fieldset>
+        {saveError && (
+
+          <p className="form-error">{saveError}</p>
+
+        )}
+
+        <fieldset disabled={saving}>
 
           <legend className="sr-only">
 
@@ -1073,7 +1314,7 @@ export function Quiz() {
 
             className="button secondary"
 
-            disabled={index === 0}
+            disabled={index === 0 || saving}
 
             onClick={() => setIndex(index - 1)}
 
@@ -1095,6 +1336,8 @@ export function Quiz() {
 
             type="button"
 
+            disabled={saving}
+
           >
 
             <X size={18} />
@@ -1107,7 +1350,7 @@ export function Quiz() {
 
             className="button"
 
-            disabled={selected === undefined}
+            disabled={selected === undefined || saving}
 
             onClick={next}
 
@@ -1115,11 +1358,15 @@ export function Quiz() {
 
           >
 
-            {index === questions.length - 1
+            {saving
 
-              ? 'See My Results'
+              ? 'Saving...'
 
-              : 'Next'}
+              : index === questions.length - 1
+
+                ? 'See My Results'
+
+                : 'Next'}
 
             <ArrowRight />
 
@@ -1140,301 +1387,283 @@ export function Quiz() {
 export function Results() {
 
   const nav = useNavigate();
+  const { id } = useParams();
 
-  const latest =
+  const [latest, setLatest] = useState(null);
+  const [loadingResult, setLoadingResult] = useState(true);
+  const [resultError, setResultError] = useState('');
 
-    JSON.parse(
+  useEffect(() => {
+    let cancelled = false;
 
-      localStorage.getItem('wbc-latest') || 'null'
+    async function loadAssessment() {
+      const accessToken = storage.getAccessToken();
 
-    ) || {
-
-      score: 58,
-
-      date: '02 May 2026',
-
-      domainScores: {
-
-        'Emotional Health': 12,
-
-        'Stress & Anxiety': 15,
-
-        'Sleep & Energy': 11,
-
-        'Social Connection': 9,
-
-        'Daily Functioning': 11
-
+      if (!accessToken) {
+        storage.clearAuth();
+        nav('/login');
+        return;
       }
 
-    };
+      if (!id) {
+        nav('/dashboard');
+        return;
+      }
 
-  const risk = riskFor(latest.score);
+      try {
+        setLoadingResult(true);
+        setResultError('');
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/assessments/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+          storage.clearAuth();
+          nav('/login');
+          return;
+        }
+
+        if (!response.ok || !data.success || !data.assessment) {
+          throw new Error(
+            data.message || 'Unable to load this assessment.'
+          );
+        }
+
+        if (!cancelled) {
+          const assessment = data.assessment;
+
+          setLatest({
+            id: assessment.id,
+            score: assessment.total_score,
+            domainScores: assessment.domain_scores,
+            riskLevel: assessment.risk_level,
+            date: new Date(
+              assessment.completed_at
+            ).toLocaleDateString('en-AU', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })
+          });
+        }
+      } catch (error) {
+        console.error('Load assessment error:', error);
+
+        if (!cancelled) {
+          setResultError(
+            error instanceof Error
+              ? error.message
+              : 'Unable to load this assessment.'
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingResult(false);
+        }
+      }
+    }
+
+    loadAssessment();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, nav]);
 
   const maxByDomain = {
-
     'Emotional Health': 24,
-
     'Stress & Anxiety': 24,
-
     'Sleep & Energy': 20,
-
     'Social Connection': 20,
-
     'Daily Functioning': 20
-
   };
 
   function download() {
+    if (!latest) {
+      return;
+    }
+
+    const risk = riskFor(latest.score);
 
     const lines = [
-
       `WellBeingCheck Report — ${latest.date}`,
-
       `Total score: ${latest.score} / 108`,
-
       `Guidance: ${risk.label}`,
-
       '',
-
       ...domains.map(
-
         (domain) =>
-
           `${domain}: ${
-
             latest.domainScores[domain] ?? 0
-
           } / ${maxByDomain[domain]}`
-
       ),
-
       '',
-
       'This is a screening result, not a medical diagnosis.'
-
     ];
 
     const blob = new Blob(
-
       [lines.join('\n')],
-
       {
-
         type: 'text/plain'
-
       }
-
     );
 
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement('a');
 
     link.href = url;
-
     link.download = 'wellbeingcheck-report.txt';
-
     link.click();
 
     URL.revokeObjectURL(url);
-
   }
 
+  if (loadingResult) {
+    return (
+      <main className="results shell">
+        <p className="prototype">Loading your assessment result...</p>
+      </main>
+    );
+  }
+
+  if (resultError || !latest) {
+    return (
+      <main className="results shell">
+        <Logo />
+        <p className="form-error">
+          {resultError || 'Assessment not found.'}
+        </p>
+
+        <Link className="button" to="/dashboard">
+          Return to Dashboard
+        </Link>
+      </main>
+    );
+  }
+
+  const risk = riskFor(latest.score);
+
   return (
-
     <>
-
       <header className="results-header">
-
         <div className="shell nav">
-
           <Logo />
 
           <Link
-
             className="button secondary small"
-
             to="/dashboard"
-
           >
-
             Dashboard
-
           </Link>
-
         </div>
-
       </header>
 
       <main className="results shell">
-
         <div className="results-title">
-
           <span className="eyebrow">
-
             <Sparkles />
-
             Screening complete
-
           </span>
 
           <h1>Your wellbeing snapshot</h1>
-
           <p>Completed {latest.date}</p>
-
         </div>
 
         <section className="result-summary">
-
           <div className="big-score">
-
             <strong>{latest.score}</strong>
-
             <span>/ 108</span>
-
           </div>
 
           <div>
-
             <span className={`status ${risk.className}`}>
-
               {risk.label}
-
             </span>
 
             <h2>Your overall result</h2>
-
             <p>{risk.message}</p>
-
           </div>
-
         </section>
 
         <section className="domain-section">
-
           <h2>Your five domains</h2>
 
           {domains.map((domain) => {
-
-            const score =
-
-              latest.domainScores[domain] ?? 0;
-
-            const max =
-
-              maxByDomain[domain];
+            const score = latest.domainScores[domain] ?? 0;
+            const max = maxByDomain[domain];
 
             return (
-
               <article key={domain}>
-
                 <div>
-
                   <strong>{domain}</strong>
 
                   <span>
-
                     {score} / {max}
-
                   </span>
-
                 </div>
 
                 <div className="domain-bar">
-
                   <i
-
                     style={{
-
                       width: `${(score / max) * 100}%`
-
                     }}
-
                   />
-
                 </div>
-
               </article>
-
             );
-
           })}
-
         </section>
 
         <section className="next-steps">
-
           <h2>Suggested next steps</h2>
 
           <ol>
-
             <li>
-
               Reflect on the areas with the highest scores.
-
             </li>
 
             <li>
-
               Share your concerns with someone you trust.
-
             </li>
 
             <li>
-
               Speak with a GP or qualified mental health
-
               professional if symptoms continue or affect
-
               daily life.
-
             </li>
-
           </ol>
-
         </section>
 
         <div className="results-actions">
-
           <button
-
             className="button"
-
             onClick={download}
-
           >
-
             <Download />
-
             Download Report
-
           </button>
 
           <button
-
             className="button secondary"
-
             onClick={() => nav('/quiz')}
-
           >
-
             <RotateCcw />
-
             Retake Assessment
-
           </button>
-
         </div>
 
         <Disclaimer />
-
       </main>
 
       <Footer />
-
     </>
-
   );
 
 }
@@ -1573,6 +1802,8 @@ export function AboutScreening() {
 
 
 
+
+
 export function FAQs() {
 
   const questions = [
@@ -1613,7 +1844,7 @@ export function FAQs() {
 
       answer:
 
-        'Authentication is handled through Supabase. Assessment results in this demonstration are still stored locally in your browser.'
+        'Authentication and completed assessment results are handled through the application backend and Supabase.'
 
     },
 
@@ -1623,7 +1854,7 @@ export function FAQs() {
 
       answer:
 
-        'This demo is designed to keep your information within the browser you are using. However, it should not be treated as a production-grade system for storing sensitive information.'
+        'Completed assessment results are associated with your authenticated account. This demonstration should still not be treated as a production-grade system for storing sensitive health information.'
 
     },
 
@@ -1753,10 +1984,11 @@ export function PrivacyPolicy() {
 
             <p>
 
-              This demonstration currently stores assessment information in your browser
-              using local storage. Authentication is handled through Supabase,
-              while local storage allows assessment results to remain available
-              between pages and browser sessions.
+              Authentication and completed assessment results are handled through
+
+              the application backend and Supabase. In-progress quiz answers may
+
+              remain temporarily in session storage while you complete an assessment.
 
             </p>
 

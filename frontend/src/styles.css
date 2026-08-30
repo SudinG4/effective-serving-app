@@ -279,6 +279,96 @@ img, svg {
   gap: 12px;
 }
 
+/* Mobile menu toggle — hidden on desktop */
+.mobile-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.mobile-menu-toggle:hover {
+  background-color: var(--bg-subtle);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  /* Hide the desktop Log In link on mobile — actions row already shows it */
+  .nav-login-link {
+    display: none;
+  }
+}
+
+/* Mobile nav dropdown */
+.mobile-nav {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 20px 0 24px;
+  animation: mobileNavIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes mobileNavIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  width: min(1140px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.mobile-nav-link {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav-link:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  color: var(--brand-forest);
+}
+
+.mobile-nav-link.active {
+  font-weight: 700;
+}
+
+.mobile-nav-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(1140px, calc(100% - 32px));
+  margin-inline: auto;
+  margin-top: 20px;
+}
+
+/* Prevent body scroll when mobile menu is open */
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
 .auth-header {
   padding: 28px 0;
   border-bottom: 1px solid var(--border-subtle);

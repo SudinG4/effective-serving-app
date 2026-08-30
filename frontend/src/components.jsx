@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   HeartPulse,
   ShieldCheck,
@@ -11,6 +11,7 @@ import {
   UserRound,
   TriangleAlert,
   X,
+  Menu,
   PhoneCall,
   Sparkles,
   ArrowRight,
@@ -34,6 +35,19 @@ export function Logo() {
 
 export function PublicHeader() {
   const user = JSON.parse(localStorage.getItem('wbc-user') || 'null');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    document.body.classList.toggle('mobile-menu-open', menuOpen);
+    return () => document.body.classList.remove('mobile-menu-open');
+  }, [menuOpen]);
 
   return (
     <header className="public-header">
@@ -41,37 +55,16 @@ export function PublicHeader() {
         <Logo />
 
         <nav className="nav-links" aria-label="Main Navigation">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
+          <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Home
           </NavLink>
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
+          <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             About Us
           </NavLink>
-          <NavLink
-            to="/about-screening"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
+          <NavLink to="/about-screening" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Screening Info
           </NavLink>
-          <NavLink
-            to="/faqs"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
+          <NavLink to="/faqs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             FAQs
           </NavLink>
         </nav>
@@ -84,7 +77,7 @@ export function PublicHeader() {
             </Link>
           ) : (
             <>
-              <Link className="nav-link" to="/login">
+              <Link className="nav-link nav-login-link" to="/login">
                 Log In
               </Link>
               <Link className="button small" to="/signup">
@@ -92,8 +85,56 @@ export function PublicHeader() {
               </Link>
             </>
           )}
+
+          <button
+            type="button"
+            className="mobile-menu-toggle"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="mobile-nav" role="dialog" aria-label="Mobile Navigation">
+          <nav className="mobile-nav-links">
+            <NavLink to="/" end className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              Home
+            </NavLink>
+            <NavLink to="/about" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              About Us
+            </NavLink>
+            <NavLink to="/about-screening" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              Screening Info
+            </NavLink>
+            <NavLink to="/faqs" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              FAQs
+            </NavLink>
+          </nav>
+
+          <div className="mobile-nav-actions">
+            {user ? (
+              <Link className="button full subtle" to="/dashboard">
+                <LayoutDashboard size={16} />
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link className="button full secondary" to="/login">
+                  Log In
+                </Link>
+                <Link className="button full" to="/signup">
+                  Start Screening <ArrowRight size={15} />
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

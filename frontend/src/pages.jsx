@@ -67,21 +67,29 @@ const API_BASE_URL =
 const storage = {
 
   getUser: () =>
+
     JSON.parse(localStorage.getItem('wbc-user') || 'null'),
 
   setUser: (user) =>
+
     localStorage.setItem('wbc-user', JSON.stringify(user)),
 
   getAccessToken: () =>
+
     localStorage.getItem('wbc-access-token'),
 
   setAccessToken: (token) =>
+
     localStorage.setItem('wbc-access-token', token),
 
   clearAuth: () => {
+
     localStorage.removeItem('wbc-user');
+
     localStorage.removeItem('wbc-access-token');
+
     localStorage.removeItem('wbc-account');
+
   }
 
 };
@@ -789,249 +797,417 @@ export function Dashboard() {
   const user = storage.getUser();
 
   const [history, setHistory] = useState([]);
+
   const [loadingHistory, setLoadingHistory] = useState(true);
+
   const [historyError, setHistoryError] = useState('');
 
   useEffect(() => {
+
     let cancelled = false;
 
     async function loadAssessments() {
+
       const accessToken = storage.getAccessToken();
 
       if (!accessToken) {
+
         storage.clearAuth();
+
         nav('/login');
+
         return;
+
       }
 
       try {
+
         setLoadingHistory(true);
+
         setHistoryError('');
 
         const response = await fetch(
+
           `${API_BASE_URL}/api/assessments`,
+
           {
+
             headers: {
+
               Authorization: `Bearer ${accessToken}`
+
             }
+
           }
+
         );
 
         const data = await response.json();
 
         if (response.status === 401) {
+
           storage.clearAuth();
+
           nav('/login');
+
           return;
+
         }
 
         if (!response.ok || !data.success) {
+
           throw new Error(
+
             data.message || 'Unable to load assessment history.'
+
           );
+
         }
 
         if (!cancelled) {
+
           const mappedHistory = (data.assessments || []).map(
+
             (assessment) => ({
+
               id: assessment.id,
+
               date: new Date(
+
                 assessment.completed_at
+
               ).toLocaleDateString('en-AU', {
+
                 day: '2-digit',
+
                 month: 'short',
+
                 year: 'numeric'
+
               }),
+
               score: assessment.total_score,
+
               label: assessment.risk_level
+
             })
+
           );
 
           setHistory(mappedHistory);
+
         }
+
       } catch (error) {
+
         console.error('Load assessment history error:', error);
 
         if (!cancelled) {
+
           setHistoryError(
+
             error instanceof Error
+
               ? error.message
+
               : 'Unable to load assessment history.'
+
           );
+
         }
+
       } finally {
+
         if (!cancelled) {
+
           setLoadingHistory(false);
+
         }
+
       }
+
     }
 
     loadAssessments();
 
     return () => {
+
       cancelled = true;
+
     };
+
   }, [nav]);
 
   function logout() {
+
+    const confirmed = window.confirm(
+      'Are you sure you want to log out?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     storage.clearAuth();
+
     nav('/login');
+
   }
 
   return (
+
     <>
+
       <header className="dashboard-header">
+
         <div className="shell dash-head">
+
           <Logo />
 
           <div className="welcome">
+
             <h1>Good day, {user?.firstName || 'there'}</h1>
+
             <p>Your private wellbeing dashboard</p>
+
           </div>
 
           <div className="utility">
+
             <button aria-label="Notifications">
+
               <Bell />
+
             </button>
 
             <button aria-label="Help">
+
               <CircleHelp />
+
             </button>
 
             <button aria-label="Settings">
+
               <Settings />
+
             </button>
 
             <button onClick={logout} aria-label="Logout">
+
               Logout
+
             </button>
+
           </div>
+
         </div>
+
       </header>
 
       <main className="dashboard shell">
+
         <section className="start-card">
+
           <div>
+
             <span className="eyebrow">
+
               <Sparkles size={16} />
+
               A moment for you
+
             </span>
 
             <h2>Start Assessment</h2>
 
             <p>
+
               27 questions across 5 domains, about 8 minutes. You’ll get an
+
               instant report at the end.
+
             </p>
 
             <div className="quick-facts">
+
               <span>
+
                 <UsersRound />
+
                 5 domains
+
               </span>
 
               <span>
+
                 <Clock3 />
+
                 ~8 min
+
               </span>
 
               <span>
+
                 <FileText />
+
                 Instant report
+
               </span>
+
             </div>
+
           </div>
 
           <Link className="button" to="/quiz">
+
             Start Assessment <ArrowRight />
+
           </Link>
+
         </section>
 
         <section className="stats">
+
           <article>
+
             <strong>{history.length}</strong>
+
             <span>Assessments Taken</span>
+
           </article>
 
           <article>
+
             <strong>{history.length}</strong>
+
             <span>Reports Available</span>
+
           </article>
 
           <article>
+
             <strong>
+
               {history.length > 1 &&
+
               history[0].score < history[1].score
+
                 ? 'Improving'
+
                 : 'Keep checking in'}
+
             </strong>
+
             <span>Current Trend</span>
+
           </article>
+
         </section>
 
         <section className="history">
+
           <div className="section-title">
+
             <div>
+
               <h2>Past Results</h2>
+
               <p>Your previous screenings and reports.</p>
+
             </div>
+
           </div>
 
           {loadingHistory && (
+
             <p className="prototype">Loading your assessment history...</p>
+
           )}
 
           {historyError && (
+
             <p className="form-error">{historyError}</p>
+
           )}
 
           {!loadingHistory && !historyError && history.length === 0 && (
+
             <p className="prototype">
+
               No assessments yet. Complete your first assessment to see it here.
+
             </p>
+
           )}
 
           <div className="result-list">
+
             {history.map((item) => {
+
               const risk = riskFor(item.score);
 
               return (
+
                 <article key={item.id}>
+
                   <div>
+
                     <span className="date">{item.date}</span>
 
                     <strong>
+
                       {item.score}
+
                       <small>/ 108</small>
+
                     </strong>
+
                   </div>
 
                   <span className={`status ${risk.className}`}>
+
                     {item.label}
+
                   </span>
 
                   <div className="row-actions">
+
                     <Link to={`/results/${item.id}`}>
+
                       View Report
+
                     </Link>
 
                     <Link to="/quiz">
+
                       <RotateCcw />
+
                       Retake
+
                     </Link>
+
                   </div>
+
                 </article>
+
               );
+
             })}
+
           </div>
+
         </section>
 
         <Disclaimer />
+
       </main>
 
       <BottomNav />
+
       <Footer />
+
     </>
+
   );
 
 }
@@ -1387,283 +1563,467 @@ export function Quiz() {
 export function Results() {
 
   const nav = useNavigate();
+
   const { id } = useParams();
 
   const [latest, setLatest] = useState(null);
+
   const [loadingResult, setLoadingResult] = useState(true);
+
   const [resultError, setResultError] = useState('');
 
   useEffect(() => {
+
     let cancelled = false;
 
     async function loadAssessment() {
+
       const accessToken = storage.getAccessToken();
 
       if (!accessToken) {
+
         storage.clearAuth();
+
         nav('/login');
+
         return;
+
       }
 
       if (!id) {
+
         nav('/dashboard');
+
         return;
+
       }
 
       try {
+
         setLoadingResult(true);
+
         setResultError('');
 
         const response = await fetch(
+
           `${API_BASE_URL}/api/assessments/${id}`,
+
           {
+
             headers: {
+
               Authorization: `Bearer ${accessToken}`
+
             }
+
           }
+
         );
 
         const data = await response.json();
 
         if (response.status === 401) {
+
           storage.clearAuth();
+
           nav('/login');
+
           return;
+
         }
 
         if (!response.ok || !data.success || !data.assessment) {
+
           throw new Error(
+
             data.message || 'Unable to load this assessment.'
+
           );
+
         }
 
         if (!cancelled) {
+
           const assessment = data.assessment;
 
           setLatest({
+
             id: assessment.id,
+
             score: assessment.total_score,
+
             domainScores: assessment.domain_scores,
+
             riskLevel: assessment.risk_level,
+
             date: new Date(
+
               assessment.completed_at
+
             ).toLocaleDateString('en-AU', {
+
               day: '2-digit',
+
               month: 'short',
+
               year: 'numeric'
+
             })
+
           });
+
         }
+
       } catch (error) {
+
         console.error('Load assessment error:', error);
 
         if (!cancelled) {
+
           setResultError(
+
             error instanceof Error
+
               ? error.message
+
               : 'Unable to load this assessment.'
+
           );
+
         }
+
       } finally {
+
         if (!cancelled) {
+
           setLoadingResult(false);
+
         }
+
       }
+
     }
 
     loadAssessment();
 
     return () => {
+
       cancelled = true;
+
     };
+
   }, [id, nav]);
 
   const maxByDomain = {
+
     'Emotional Health': 24,
+
     'Stress & Anxiety': 24,
+
     'Sleep & Energy': 20,
+
     'Social Connection': 20,
+
     'Daily Functioning': 20
+
   };
 
   function download() {
+
     if (!latest) {
+
       return;
+
     }
 
     const risk = riskFor(latest.score);
 
     const lines = [
+
       `WellBeingCheck Report — ${latest.date}`,
+
       `Total score: ${latest.score} / 108`,
+
       `Guidance: ${risk.label}`,
+
       '',
+
       ...domains.map(
+
         (domain) =>
+
           `${domain}: ${
+
             latest.domainScores[domain] ?? 0
+
           } / ${maxByDomain[domain]}`
+
       ),
+
       '',
+
       'This is a screening result, not a medical diagnosis.'
+
     ];
 
     const blob = new Blob(
+
       [lines.join('\n')],
+
       {
+
         type: 'text/plain'
+
       }
+
     );
 
     const url = URL.createObjectURL(blob);
+
     const link = document.createElement('a');
 
     link.href = url;
+
     link.download = 'wellbeingcheck-report.txt';
+
     link.click();
 
     URL.revokeObjectURL(url);
+
   }
 
   if (loadingResult) {
+
     return (
+
       <main className="results shell">
+
         <p className="prototype">Loading your assessment result...</p>
+
       </main>
+
     );
+
   }
 
   if (resultError || !latest) {
+
     return (
+
       <main className="results shell">
+
         <Logo />
+
         <p className="form-error">
+
           {resultError || 'Assessment not found.'}
+
         </p>
 
         <Link className="button" to="/dashboard">
+
           Return to Dashboard
+
         </Link>
+
       </main>
+
     );
+
   }
 
   const risk = riskFor(latest.score);
 
   return (
+
     <>
+
       <header className="results-header">
+
         <div className="shell nav">
+
           <Logo />
 
           <Link
+
             className="button secondary small"
+
             to="/dashboard"
+
           >
+
             Dashboard
+
           </Link>
+
         </div>
+
       </header>
 
       <main className="results shell">
+
         <div className="results-title">
+
           <span className="eyebrow">
+
             <Sparkles />
+
             Screening complete
+
           </span>
 
           <h1>Your wellbeing snapshot</h1>
+
           <p>Completed {latest.date}</p>
+
         </div>
 
         <section className="result-summary">
+
           <div className="big-score">
+
             <strong>{latest.score}</strong>
+
             <span>/ 108</span>
+
           </div>
 
           <div>
+
             <span className={`status ${risk.className}`}>
+
               {risk.label}
+
             </span>
 
             <h2>Your overall result</h2>
+
             <p>{risk.message}</p>
+
           </div>
+
         </section>
 
         <section className="domain-section">
+
           <h2>Your five domains</h2>
 
           {domains.map((domain) => {
+
             const score = latest.domainScores[domain] ?? 0;
+
             const max = maxByDomain[domain];
 
             return (
+
               <article key={domain}>
+
                 <div>
+
                   <strong>{domain}</strong>
 
                   <span>
+
                     {score} / {max}
+
                   </span>
+
                 </div>
 
                 <div className="domain-bar">
+
                   <i
+
                     style={{
+
                       width: `${(score / max) * 100}%`
+
                     }}
+
                   />
+
                 </div>
+
               </article>
+
             );
+
           })}
+
         </section>
 
         <section className="next-steps">
+
           <h2>Suggested next steps</h2>
 
           <ol>
+
             <li>
+
               Reflect on the areas with the highest scores.
+
             </li>
 
             <li>
+
               Share your concerns with someone you trust.
+
             </li>
 
             <li>
+
               Speak with a GP or qualified mental health
+
               professional if symptoms continue or affect
+
               daily life.
+
             </li>
+
           </ol>
+
         </section>
 
         <div className="results-actions">
+
           <button
+
             className="button"
+
             onClick={download}
+
           >
+
             <Download />
+
             Download Report
+
           </button>
 
           <button
+
             className="button secondary"
+
             onClick={() => nav('/quiz')}
+
           >
+
             <RotateCcw />
+
             Retake Assessment
+
           </button>
+
         </div>
 
         <Disclaimer />
+
       </main>
 
       <Footer />
+
     </>
+
   );
 
 }
@@ -1799,6 +2159,10 @@ export function AboutScreening() {
   );
 
 }
+
+
+
+
 
 
 
@@ -2183,3 +2547,5 @@ export function Terms() {
   );
 
 }
+
+

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import {
   Home,
   Login,
@@ -12,17 +13,27 @@ import {
   PrivacyPolicy,
   Terms
 } from './pages';
+
 import About from './screens/about';
 
-function ProtectedRoute({ children }) {
-  const user = JSON.parse(
-    localStorage.getItem('wbc-user') || 'null'
-  );
-
+function isAuthenticated() {
+  const user = localStorage.getItem('wbc-user');
   const accessToken = localStorage.getItem('wbc-access-token');
 
-  if (!user || !accessToken) {
+  return !!user && !!accessToken;
+}
+
+function ProtectedRoute({ children }) {
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function PublicOnlyRoute({ children }) {
+  if (isAuthenticated()) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -31,17 +42,49 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+
+      {/* Public home */}
+      <Route
+        path="/"
+        element={
+          <PublicOnlyRoute>
+            <Home />
+          </PublicOnlyRoute>
+        }
+      />
+
+      {/* Login */}
+      <Route
+        path="/login"
+        element={
+          <PublicOnlyRoute>
+            <Login />
+          </PublicOnlyRoute>
+        }
+      />
+
+      {/* Signup */}
+      <Route
+        path="/signup"
+        element={
+          <PublicOnlyRoute>
+            <Signup />
+          </PublicOnlyRoute>
+        }
+      />
+
+      {/* Information pages */}
       <Route path="/about" element={<About />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
 
       <Route
         path="/about-screening"
         element={<AboutScreening />}
       />
 
-      <Route path="/faqs" element={<FAQs />} />
+      <Route
+        path="/faqs"
+        element={<FAQs />}
+      />
 
       <Route
         path="/privacy"
@@ -53,6 +96,7 @@ export default function App() {
         element={<Terms />}
       />
 
+      {/* Logged-in dashboard */}
       <Route
         path="/dashboard"
         element={
@@ -62,6 +106,7 @@ export default function App() {
         }
       />
 
+      {/* Assessment */}
       <Route
         path="/quiz"
         element={
@@ -71,6 +116,7 @@ export default function App() {
         }
       />
 
+      {/* Results */}
       <Route
         path="/results"
         element={
@@ -89,6 +135,7 @@ export default function App() {
         }
       />
 
+      {/* 404 */}
       <Route
         path="/404"
         element={<NotFound />}
@@ -96,13 +143,9 @@ export default function App() {
 
       <Route
         path="*"
-        element={
-          <Navigate
-            to="/404"
-            replace
-          />
-        }
+        element={<Navigate to="/404" replace />}
       />
+
     </Routes>
   );
 }

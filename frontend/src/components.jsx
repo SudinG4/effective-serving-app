@@ -14,8 +14,15 @@ import {
 } from 'lucide-react';
 
 export function Logo() {
+  const isLoggedIn =
+    !!localStorage.getItem('wbc-access-token');
+
   return (
-    <Link className="logo" to="/" aria-label="WellBeingCheck home">
+    <Link
+      className="logo"
+      to={isLoggedIn ? '/dashboard' : '/'}
+      aria-label="WellBeingCheck home"
+    >
       <span className="logo-mark">
         <HeartPulse size={21} />
       </span>
@@ -116,7 +123,7 @@ const resourceContent = {
         <details>
           <summary>Can other people see my results?</summary>
           <p>
-            This demo is designed to keep your information within the browser
+            This demo is designed to keep your informationwithin the browser
             you are using. It should not be considered a production-grade
             system for sensitive health information.
           </p>
@@ -214,7 +221,7 @@ const resourceContent = {
 
         <h3>Accuracy and limitations</h3>
         <p>
-          Results depend on the responses provided and are intended only as
+          Results depend on the responses provided and areintended only as
           general wellbeing guidance. They should not replace professional
           assessment.
         </p>
@@ -428,7 +435,7 @@ export function Disclaimer() {
   return (
     <p className="disclaimer">
       <TriangleAlert size={17} />
-      WellBeingCheck is a screening tool, not a diagnostic or emergency
+      WellBeingCheck is a screening tool, not a diagnosticor emergency
       service. Discuss concerns with a qualified health professional.
     </p>
   );

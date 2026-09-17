@@ -20,6 +20,8 @@ import {
 
   HeartPulse,
 
+  Menu,
+
   RotateCcw,
 
   Settings,
@@ -301,6 +303,48 @@ function AuthShell({ signup = false }) {
   const [status, setStatus] = useState('');
 
   const [loading, setLoading] = useState(false);
+
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
+
+  async function requestPasswordReset() {
+    const email = form.email.trim().toLowerCase();
+
+    setError('');
+    setStatus('');
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError('Enter your email address first, then select Forgot password.');
+      return;
+    }
+
+    try {
+      setRecoveryLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || 'Unable to send the password reset email.');
+      }
+
+      setStatus('If an account exists for that email, a password reset link has been sent.');
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to send the password reset email.'
+      );
+    } finally {
+      setRecoveryLoading(false);
+    }
+  }
 
   async function submit(e) {
 
@@ -702,6 +746,19 @@ function AuthShell({ signup = false }) {
 
           </label>
 
+          {!signup && (
+            <div className="forgot-password-row">
+              <button
+                className="forgot-password-button"
+                type="button"
+                onClick={requestPasswordReset}
+                disabled={loading || recoveryLoading}
+              >
+                {recoveryLoading ? 'Sending reset link…' : 'Forgot password?'}
+              </button>
+            </div>
+          )}
+
           {error && <p className="form-error">{error}</p>}
 
           {status && (
@@ -801,6 +858,15 @@ export function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(true);
 
   const [historyError, setHistoryError] = useState('');
+
+  const [dashboardMenuOpen, setDashboardMenuOpen] = useState(false);
+
+  const [activeDashboardPanel, setActiveDashboardPanel] = useState(null);
+
+  function openDashboardPanel(panel) {
+    setActiveDashboardPanel(panel);
+    setDashboardMenuOpen(false);
+  }
 
   useEffect(() => {
 
@@ -972,21 +1038,50 @@ export function Dashboard() {
 
           </div>
 
-          <div className="utility">
+          <div className="dashboard-controls">
 
-            <button aria-label="Notifications">
+            <button
+              className="dashboard-menu-toggle"
+              type="button"
+              aria-label={dashboardMenuOpen ? 'Close dashboard menu' : 'Open dashboard menu'}
+              aria-expanded={dashboardMenuOpen}
+              aria-controls="dashboard-navigation"
+              onClick={() => setDashboardMenuOpen((open) => !open)}
+            >
+              {dashboardMenuOpen ? <X size={23} /> : <Menu size={23} />}
+            </button>
+
+            <nav
+              id="dashboard-navigation"
+              className={`utility${dashboardMenuOpen ? ' is-open' : ''}`}
+              aria-label="Dashboard controls"
+            >
+
+            <button
+              type="button"
+              aria-label="Notifications"
+              onClick={() => openDashboardPanel('notifications')}
+            >
 
               <Bell />
 
             </button>
 
-            <button aria-label="Help">
+            <button
+              type="button"
+              aria-label="Help"
+              onClick={() => nav('/faqs')}
+            >
 
               <CircleHelp />
 
             </button>
 
-            <button aria-label="Settings">
+            <button
+              type="button"
+              aria-label="Settings"
+              onClick={() => openDashboardPanel('settings')}
+            >
 
               <Settings />
 
@@ -997,6 +1092,41 @@ export function Dashboard() {
               Logout
 
             </button>
+
+            </nav>
+
+            {activeDashboardPanel && (
+              <section
+                className="dashboard-popover"
+                aria-label={activeDashboardPanel === 'notifications' ? 'Notifications' : 'Settings'}
+              >
+                <button
+                  className="dashboard-popover-close"
+                  type="button"
+                  aria-label="Close panel"
+                  onClick={() => setActiveDashboardPanel(null)}
+                >
+                  <X size={18} />
+                </button>
+
+                {activeDashboardPanel === 'notifications' ? (
+                  <>
+                    <h2>Notifications</h2>
+                    <p>You’re all caught up. There are no new notifications.</p>
+                  </>
+                ) : (
+                  <>
+                    <h2>Account settings</h2>
+                    <p>
+                      Signed in as <strong>{user?.email || user?.firstName || 'your account'}</strong>.
+                    </p>
+                    <button className="button secondary full" type="button" onClick={logout}>
+                      Log out
+                    </button>
+                  </>
+                )}
+              </section>
+            )}
 
           </div>
 

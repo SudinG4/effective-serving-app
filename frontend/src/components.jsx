@@ -10,6 +10,7 @@ import {
   ClipboardList,
   UserRound,
   TriangleAlert,
+  Menu,
   X
 } from 'lucide-react';
 
@@ -32,20 +33,57 @@ export function Logo() {
 }
 
 export function PublicHeader() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isLoggedIn = Boolean(
+    localStorage.getItem('wbc-user') && localStorage.getItem('wbc-access-token')
+  );
+
+  useEffect(() => {
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
+
   return (
     <header className="public-header">
       <div className="shell nav">
         <Logo />
 
-        <div className="nav-actions">
-          <Link className="text-link" to="/login">
-            Log In
-          </Link>
+        <button
+          className="nav-menu-toggle"
+          type="button"
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={menuOpen}
+          aria-controls="public-navigation"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? <X size={23} /> : <Menu size={23} />}
+        </button>
 
-          <Link className="button small" to="/signup">
-            Get Started
-          </Link>
-        </div>
+        <nav
+          id="public-navigation"
+          className={`nav-actions${menuOpen ? ' is-open' : ''}`}
+          aria-label="Main navigation"
+        >
+          {isLoggedIn ? (
+            <Link className="button small" to="/dashboard" onClick={() => setMenuOpen(false)}>
+              Back to Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link className="text-link" to="/login" onClick={() => setMenuOpen(false)}>
+                Log In
+              </Link>
+
+              <Link className="button small" to="/signup" onClick={() => setMenuOpen(false)}>
+                Get Started
+              </Link>
+            </>
+          )}
+        </nav>
       </div>
     </header>
   );

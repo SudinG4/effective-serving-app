@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { downloadStoredReport } from './reportApi';
 
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -702,6 +703,8 @@ function AuthShell({ signup = false }) {
 
           </label>
 
+          {!signup && <p className="switch"><Link to="/forgot-password">Forgot password?</Link></p>}
+
           {error && <p className="form-error">{error}</p>}
 
           {status && (
@@ -1005,6 +1008,7 @@ export function Dashboard() {
       </header>
 
       <main className="dashboard shell">
+        <p><Link className="button secondary" to="/reports">View saved reports</Link></p>
 
         <section className="start-card">
 
@@ -1728,68 +1732,15 @@ export function Results() {
 
   };
 
-  function download() {
-
-    if (!latest) {
-
-      return;
-
-    }
-
-    const risk = riskFor(latest.score);
-
-    const lines = [
-
-      `WellBeingCheck Report — ${latest.date}`,
-
-      `Total score: ${latest.score} / 108`,
-
-      `Guidance: ${risk.label}`,
-
-      '',
-
-      ...domains.map(
-
-        (domain) =>
-
-          `${domain}: ${
-
-            latest.domainScores[domain] ?? 0
-
-          } / ${maxByDomain[domain]}`
-
-      ),
-
-      '',
-
-      'This is a screening result, not a medical diagnosis.'
-
-    ];
-
-    const blob = new Blob(
-
-      [lines.join('\n')],
-
-      {
-
-        type: 'text/plain'
-
-      }
-
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-
-    link.href = url;
-
-    link.download = 'wellbeingcheck-report.txt';
-
-    link.click();
-
-    URL.revokeObjectURL(url);
-
+  const [downloadingReport, setDownloadingReport] = useState(false);
+  const [downloadError, setDownloadError] = useState('');
+  async function download() {
+    if (!latest || downloadingReport) return;
+    setDownloadingReport(true);
+    setDownloadError('');
+    try { await downloadStoredReport(latest.id); }
+    catch (error) { setDownloadError(error.message); }
+    finally { setDownloadingReport(false); }
   }
 
   if (loadingResult) {
@@ -1984,6 +1935,8 @@ export function Results() {
 
         </section>
 
+        {downloadError && <p className="form-error" role="alert">{downloadError}</p>}
+        <p><Link to="/reports">View saved reports</Link></p>
         <div className="results-actions">
 
           <button
@@ -1991,12 +1944,13 @@ export function Results() {
             className="button"
 
             onClick={download}
+            disabled={downloadingReport}
 
           >
 
             <Download />
 
-            Download Report
+            {downloadingReport ? 'Downloading…' : 'Download Report'}
 
           </button>
 

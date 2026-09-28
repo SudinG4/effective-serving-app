@@ -1,1 +1,1 @@
-# effective-serving-app
+# Run [backend/supabase/001_reports.sql](backend/supabase/001_reports.sql) in the project's Supabase SQL Editor as the database owner before using assessments. It assumes the existing `public.assessments` table has UUID `id` / `user_id`, JSON `answers` / `domain_scores`, and `completed_at`, `total_score`, `risk_level` columns.

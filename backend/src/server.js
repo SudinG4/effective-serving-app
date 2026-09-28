@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import reportRoutes from './routes/reportRoutes.js';
 import dotenv from 'dotenv';
 
 import {
@@ -115,6 +116,7 @@ app.use(
   '/api/assessments',
   assessmentRoutes
 );
+app.use('/api/reports', reportRoutes);
 
 app.use(
   '/api',

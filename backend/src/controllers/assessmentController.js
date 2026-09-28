@@ -31,6 +31,13 @@ export async function createAssessment(
       riskLevel
     } = calculated;
 
+    // Fail before saving if report storage has not been installed. Once the
+    // migration is applied, its trigger saves assessment + report atomically.
+    const { error: reportStorageError } = await req.supabase.from('reports').select('id').limit(0);
+    if (reportStorageError) {
+      return res.status(503).json({ success: false, message: 'Report storage is unavailable. Please contact the administrator before submitting again.' });
+    }
+
     const {
       data,
       error

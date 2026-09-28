@@ -15,6 +15,8 @@ import {
 } from './pages';
 
 import About from './screens/about';
+import Reports from './screens/reports';
+import { ForgotPassword, ResetPassword } from './screens/passwordRecovery';
 
 function isAuthenticated() {
   const user = localStorage.getItem('wbc-user');
@@ -42,6 +44,9 @@ function PublicOnlyRoute({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Public home */}
       <Route

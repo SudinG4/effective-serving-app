@@ -454,7 +454,7 @@ export function BottomNav() {
         <span>Assessment</span>
       </NavLink>
 
-      <NavLink to="/results">
+      <NavLink to="/reports">
         <ChartNoAxesCombined />
         <span>Results</span>
       </NavLink>

@@ -82,6 +82,8 @@ out
 .nuxt
 dist
 .output
+.readme.*
+.README.*
 
 # Gatsby files
 .cache/

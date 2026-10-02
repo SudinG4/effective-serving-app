@@ -1,4 +1,6 @@
 import express from 'express';
+import { requireAuth } from '../middleware/authMiddleware.js';
+import { getProfile, updateProfile } from '../controllers/profileController.js';
 import { forgotPassword, resetPassword } from '../controllers/passwordController.js';
 
 import {
@@ -7,6 +9,8 @@ import {
 } from '../controllers/authController.js';
 
 const router = express.Router();
+router.get('/profile', requireAuth, getProfile);
+router.patch('/profile', requireAuth, updateProfile);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 

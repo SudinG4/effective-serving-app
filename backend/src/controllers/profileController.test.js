@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { updateProfile } from './profileController.js';
 
 function response() {
-  return { code: 200, status(code) { this.code = code; return this; }, json(body) { this.body = body; return this; } };
+  return { code: 200, headers: {}, set(name, value) { this.headers[name] = value; return this; }, status(code) { this.code = code; return this; }, json(body) { this.body = body; return this; } };
 }
 test('profile updates reject blank names and short passwords', async () => {
   for (const body of [{ firstName: ' ', lastName: 'User' }, { firstName: 'Test', lastName: 'User', password: '123' }]) {
@@ -26,6 +26,7 @@ test('profile updates use the authenticated token and preserve other metadata', 
     assert.equal(sent.headers.Authorization, 'Bearer authenticated-token');
     assert.deepEqual(JSON.parse(sent.body), { data: { phone: '123', first_name: 'New', last_name: 'Name' }, password: 'long-password' });
     assert.equal(res.body.user.id, 'authenticated-user');
+    assert.equal(res.headers['Cache-Control'], 'no-store');
   } finally { globalThis.fetch = original; }
 });
 test('upstream errors are shown without reporting success', async () => {

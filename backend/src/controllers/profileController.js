@@ -19,6 +19,7 @@ export async function updateProfile(req, res) {
     });
     const user = await response.json();
     if (!response.ok) return res.status(400).json({ success: false, message: user.msg || user.message || 'Unable to update account.' });
+    res.set('Cache-Control', 'no-store');
     return res.json({ success: true, user });
   } catch {
     return res.status(503).json({ success: false, message: 'Unable to update account. Please try again.' });

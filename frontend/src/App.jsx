@@ -16,6 +16,7 @@ import {
 
 import About from './screens/about';
 import Reports from './screens/reports';
+import Account from './screens/account';
 import { ForgotPassword, ResetPassword } from './screens/passwordRecovery';
 
 function isAuthenticated() {
@@ -44,6 +45,8 @@ function PublicOnlyRoute({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Account /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { downloadStoredReport } from './reportApi';
+import Notifications from './screens/notifications';
 
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -116,167 +117,77 @@ function profileFromSupabaseUser(user) {
 }
 
 export function Home() {
-
   return (
-
     <>
-
       <PublicHeader />
 
       <main>
-
         <section className="hero shell">
-
           <div className="hero-copy">
-
             <span className="eyebrow">
-
               <Sparkles size={16} />
-
-              Evidence-informed wellbeing screening
-
+              Trauma-informed wellbeing
             </span>
 
-            <h1>Understand Your Wellbeing — Clearly</h1>
+            <h1>Check Your Wellbeing</h1>
 
             <p className="lead">
-
-              A 27-point self-assessment across five domains. Answer honestly
-
-              and get an instant, private report that helps guide your next
-
-              step.
-
+              A wellbeing check designed to help you understand how you're doing,
+              recognise areas of concern, and identify where support may be
+              helpful.
             </p>
 
             <div className="hero-actions">
-
               <Link className="button" to="/signup">
-
-                Get Started <ArrowRight size={18} />
-
+                Start Assessment <ArrowRight size={18} />
               </Link>
-
-              <Link className="button secondary" to="/login">
-
-                Log In
-
-              </Link>
-
             </div>
 
             <p className="micro">
-
-              Takes about 8 minutes. No diagnosis — a screen to guide your
-
-              next step.
-
+              27 questions · About 8 minutes · Private results
             </p>
-
           </div>
 
           <div className="sample-card">
-
             <div className="sample-top">
-
               <span>Sample result</span>
-
               <span className="status safe">Screening complete</span>
-
             </div>
 
             <div className="score-ring">
-
               <strong>58</strong>
-
               <span>/ 108</span>
-
             </div>
 
-            {[
-
-              'Emotional Health',
-
-              'Stress & Anxiety',
-
-              'Sleep & Energy'
-
-            ].map((item, index) => (
-
-              <div className="mini-row" key={item}>
-
-                <span>{item}</span>
-
-                <div>
-
-                  <i
-
-                    style={{
-
-                      width: `${[68, 51, 76][index]}%`
-
-                    }}
-
-                  />
-
+            {['Emotional Health', 'Stress & Anxiety', 'Sleep & Energy'].map(
+              (x, i) => (
+                <div className="mini-row" key={x}>
+                  <span>{x}</span>
+                  <div>
+                    <i style={{ width: `${[68, 51, 76][i]}%` }} />
+                  </div>
                 </div>
-
-              </div>
-
-            ))}
-
+              )
+            )}
           </div>
-
         </section>
 
         <section className="features shell">
-
           {featureData.map(([Icon, title, text]) => (
-
             <article key={title}>
-
               <span className="icon">
-
                 <Icon />
-
               </span>
-
               <h3>{title}</h3>
-
               <p>{text}</p>
-
             </article>
-
           ))}
-
         </section>
-
-        <section className="cta shell">
-
-          <h2>Ready to check in with yourself?</h2>
-
-          <p>
-
-            It only takes a few minutes, and what you learn is yours to keep.
-
-          </p>
-
-          <Link className="button light" to="/quiz">
-
-            Start Assessment <ArrowRight size={18} />
-
-          </Link>
-
-        </section>
-
       </main>
 
       <Footer />
-
     </>
-
   );
-
 }
 
 function AuthShell({ signup = false }) {
@@ -985,19 +896,15 @@ export function Dashboard() {
 
           <div className="utility">
 
-            <button aria-label="Notifications">
+            <Notifications />
 
-              <Bell />
-
-            </button>
-
-            <button aria-label="Help">
+            <button aria-label="Help" onClick={() => nav('/faqs')}>
 
               <CircleHelp />
 
             </button>
 
-            <button aria-label="Settings">
+            <button aria-label="Settings" onClick={() => nav('/settings')}>
 
               <Settings />
 
@@ -2170,7 +2077,7 @@ export function FAQs() {
 
       answer:
 
-        'Authentication and completed assessment results are handled through the application backend and Supabase.'
+        'Your completed assessments and reports are saved to your account. Open View saved reports on your dashboard, or Results in the bottom navigation, to view and download them.'
 
     },
 
@@ -2180,7 +2087,7 @@ export function FAQs() {
 
       answer:
 
-        'Completed assessment results are associated with your authenticated account. This demonstration should still not be treated as a production-grade system for storing sensitive health information.'
+        'You can view your own reports when signed in. Authorized administrators can also review reports from all users.'
 
     },
 
@@ -2202,11 +2109,13 @@ export function FAQs() {
 
       <PublicHeader />
 
-      <main className="info-page">
+      <main className="info-page faq-page">
 
-        <div className="info-container">
+        <div className="info-container faq-container">
 
-          <p className="info-eyebrow">Resources</p>
+          <div className="faq-intro">
+          <span className="faq-icon"><CircleHelp size={32} /></span>
+          <p className="info-eyebrow">Help & resources</p>
 
           <h1>Frequently asked questions</h1>
 
@@ -2217,14 +2126,15 @@ export function FAQs() {
             assessment works.
 
           </p>
-
+          <div className="faq-quick-links"><Link to="/dashboard">Back to dashboard <ArrowRight size={16} /></Link><Link to="/reports">View your reports <FileText size={16} /></Link></div>
+          </div>
           <div className="faq-list">
 
             {questions.map(({ question, answer }) => (
 
               <details className="faq-item" key={question}>
 
-                <summary>{question}</summary>
+                <summary><span>{question}</span><span className="faq-toggle" aria-hidden="true">+</span></summary>
 
                 <p>{answer}</p>
 
@@ -2233,6 +2143,7 @@ export function FAQs() {
             ))}
 
           </div>
+          <aside className="faq-support"><HeartPulse size={24} /><div><h2>Need more support?</h2><p>If your results concern you, talk with a qualified health professional. For immediate danger, contact your local emergency service.</p></div></aside>
 
         </div>
 

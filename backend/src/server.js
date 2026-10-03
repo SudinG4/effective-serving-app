@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import reportRoutes from './routes/reportRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import dotenv from 'dotenv';
 
 import {
@@ -117,6 +118,7 @@ app.use(
   assessmentRoutes
 );
 app.use('/api/reports', reportRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use(
   '/api',

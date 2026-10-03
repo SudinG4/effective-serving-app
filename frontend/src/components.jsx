@@ -40,19 +40,25 @@ export function PublicHeader() {
         <Logo />
 
         <div className="nav-actions">
+          <Link className="text-link" to="/about">
+            About Us
+          </Link>
+
           {isLoggedIn ? (
             <Link className="button small" to="/dashboard">
               Dashboard
             </Link>
-          ) : <>
-          <Link className="text-link" to="/login">
-            Log In
-          </Link>
+          ) : (
+            <>
+              <Link className="text-link" to="/login">
+                Log In
+              </Link>
 
-          <Link className="button small" to="/signup">
-            Get Started
-          </Link>
-          </>}
+              <Link className="button small" to="/signup">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

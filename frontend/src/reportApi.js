@@ -24,7 +24,7 @@ export async function downloadStoredReport(assessmentId) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `wellbeing-report-${assessmentId}.html`;
+  link.download = `wellbeing-report-${assessmentId}.pdf`;
   document.body.appendChild(link);
   link.click();
   link.remove();

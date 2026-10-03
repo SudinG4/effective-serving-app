@@ -15,7 +15,10 @@ export default function Reports() {
     setLoading(true);
     setError('');
     reportRequest(`?page=${page}`).then(r => r.json()).then(result => {
-      if (active) setData(result);
+      if (active) {
+        setData(result);
+        console.log(result.role === 'admin' ? 'Admin role' : 'User role');
+      }
     }).catch(err => { if (active) setError(err.message); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -32,7 +35,7 @@ export default function Reports() {
     <main className="results shell">
       <h1>{data?.role === 'admin' ? 'All assessment reports' : 'My assessment reports'}</h1>
       <p>{data?.role === 'admin' ? 'Administrator access: review and download reports for all users.' : 'Your saved assessment reports, available whenever you need them.'}</p>
-      <p>Download a report to view its chart, feedback and support contacts. Open the downloaded file and choose Print → Save as PDF for a PDF copy.</p>
+      <p>Download a PDF report with your score chart, feedback and support contacts.</p>
       {error && <div role="alert"><p className="form-error">{error}</p><button className="button secondary" onClick={() => setRetry(n => n + 1)}>Try again</button></div>}
       {loading ? <p role="status">Loading reports…</p> : data && <>
         {!data.reports.length && <p>No reports yet. <Link to="/quiz">Take an assessment</Link> to create your first report.</p>}

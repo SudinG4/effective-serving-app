@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createServerDatabase, resolveAccountRole } from '../utils/accountRole.js';
 
 export async function requireAuth(req, res, next) {
   try {
@@ -52,8 +53,15 @@ export async function requireAuth(req, res, next) {
       });
     }
 
-    req.user = user;
+    const serverDatabase = createServerDatabase();
+    const role = await resolveAccountRole(user, serverDatabase);
+    req.user = { ...user, app_metadata: { ...user.app_metadata, role } };
     req.supabase = userSupabase;
+    if (role === 'admin') {
+      console.log('Admin role');
+      // Profile roles are verified by the backend, independent of stale JWT claims.
+      req.reportSupabase = serverDatabase || userSupabase;
+    }
 
     next();
   } catch (error) {

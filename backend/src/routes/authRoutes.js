@@ -1,5 +1,6 @@
 import express from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
+import { getProfile, updateProfile } from '../controllers/profileController.js';
 import { forgotPassword, resetPassword } from '../controllers/passwordController.js';
 
 import {
@@ -12,6 +13,8 @@ router.get('/me', requireAuth, (req, res) => {
   res.set('Cache-Control', 'no-store');
   res.json({ success: true, user: { id: req.user.id, role: req.user.app_metadata.role } });
 });
+router.get('/profile', requireAuth, getProfile);
+router.patch('/profile', requireAuth, updateProfile);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 

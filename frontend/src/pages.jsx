@@ -706,6 +706,14 @@ export function Signup() {
 
 export function Dashboard() {
 
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${storage.getAccessToken() || ''}` }, cache: 'no-store'
+    }).then(response => response.json()).then(data => {
+      if (data.success) console.log(data.user.role === 'admin' ? 'Admin role' : 'User role');
+    }).catch(() => {});
+  }, []);
+
   const nav = useNavigate();
 
   const user = storage.getUser();

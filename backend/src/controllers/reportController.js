@@ -1,8 +1,9 @@
-import { renderReport } from '../utils/reportRenderer.js';
+import { renderReportPdf } from '../utils/reportPdf.js';
 
 export const isAdmin = user => user?.app_metadata?.role === 'admin';
 export function reportQuery(req) {
-  const query = req.supabase.from('reports').select('*');
+  const database = isAdmin(req.user) ? req.reportSupabase || req.supabase : req.supabase;
+  const query = database.from('reports').select('*');
   return isAdmin(req.user) ? query : query.eq('user_id', req.user.id);
 }
 
@@ -27,8 +28,9 @@ export async function downloadReport(req, res) {
     const { data, error } = await reportQuery(req).eq('assessment_id', id).maybeSingle();
     if (error) throw error;
     if (!data) return res.status(404).json({ success: false, message: 'Report not found.' });
-    res.set({ 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Disposition': `attachment; filename="wellbeing-report-${id}.html"`, 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox" });
-    return res.type('html').send(renderReport(data));
+    const pdf = await renderReportPdf(data);
+    res.set({ 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Disposition': `attachment; filename="wellbeing-report-${id}.pdf"` });
+    return res.type('application/pdf').send(pdf);
   } catch {
     return res.status(503).json({ success: false, message: 'Unable to download report. Please try again or contact the administrator.' });
   }

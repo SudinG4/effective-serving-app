@@ -33,7 +33,12 @@ test('owner can download; another user receives 404', async () => {
   for (const [userId, code] of [['owner', 200], ['other', 404]]) {
     const res = response(); await downloadReport(request({ id: userId }), res);
     assert.equal(res.code, code);
-    if (code === 200) { assert.match(res.body, /Score chart and breakdown/); assert.equal(res.headers['Cache-Control'], 'no-store'); }
+    if (code === 200) {
+      assert.equal(res.body.subarray(0, 5).toString(), '%PDF-');
+      assert.equal(res.contentType, 'application/pdf');
+      assert.match(res.headers['Content-Disposition'], /\.pdf"$/);
+      assert.equal(res.headers['Cache-Control'], 'no-store');
+    }
   }
 });
 test('protected admin role can list and download all reports', async () => {
@@ -42,6 +47,18 @@ test('protected admin role can list and download all reports', async () => {
   assert.equal(res.body.role, 'admin'); assert.equal(res.body.reports.length, 1);
   const download = response(); await downloadReport(request(user), download);
   assert.equal(download.code, 200);
+});
+
+test('verified admin uses server report access; ordinary users cannot use that client', async () => {
+  const admin = request({ id: 'admin', app_metadata: { role: 'admin' } });
+  admin.reportSupabase = admin.supabase;
+  admin.supabase = { from() { throw new Error('Stale JWT client must not be used for verified admin'); } };
+  const res = response(); await listReports(admin, res);
+  assert.equal(res.body.reports.length, 1);
+  const user = request({ id: 'other' });
+  user.reportSupabase = { from() { throw new Error('Ordinary user must not use server client'); } };
+  const limited = response(); await listReports(user, limited);
+  assert.deepEqual(limited.body.reports, []);
 });
 test('pagination exposes at most 20 reports with next-page indication', async () => {
   const res = response(); await listReports(request({ id: 'owner' }, Array(21).fill(report)), res);

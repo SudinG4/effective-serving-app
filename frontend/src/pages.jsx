@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { downloadStoredReport } from './reportApi';
+import Notifications from './screens/notifications';
 
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -887,19 +888,15 @@ export function Dashboard() {
 
           <div className="utility">
 
-            <button aria-label="Notifications">
+            <Notifications />
 
-              <Bell />
-
-            </button>
-
-            <button aria-label="Help">
+            <button aria-label="Help" onClick={() => nav('/faqs')}>
 
               <CircleHelp />
 
             </button>
 
-            <button aria-label="Settings">
+            <button aria-label="Settings" onClick={() => nav('/settings')}>
 
               <Settings />
 
@@ -2072,7 +2069,7 @@ export function FAQs() {
 
       answer:
 
-        'Authentication and completed assessment results are handled through the application backend and Supabase.'
+        'Your completed assessments and reports are saved to your account. Open View saved reports on your dashboard, or Results in the bottom navigation, to view and download them.'
 
     },
 
@@ -2082,7 +2079,7 @@ export function FAQs() {
 
       answer:
 
-        'Completed assessment results are associated with your authenticated account. This demonstration should still not be treated as a production-grade system for storing sensitive health information.'
+        'You can view your own reports when signed in. Authorized administrators can also review reports from all users.'
 
     },
 
@@ -2104,11 +2101,13 @@ export function FAQs() {
 
       <PublicHeader />
 
-      <main className="info-page">
+      <main className="info-page faq-page">
 
-        <div className="info-container">
+        <div className="info-container faq-container">
 
-          <p className="info-eyebrow">Resources</p>
+          <div className="faq-intro">
+          <span className="faq-icon"><CircleHelp size={32} /></span>
+          <p className="info-eyebrow">Help & resources</p>
 
           <h1>Frequently asked questions</h1>
 
@@ -2119,14 +2118,15 @@ export function FAQs() {
             assessment works.
 
           </p>
-
+          <div className="faq-quick-links"><Link to="/dashboard">Back to dashboard <ArrowRight size={16} /></Link><Link to="/reports">View your reports <FileText size={16} /></Link></div>
+          </div>
           <div className="faq-list">
 
             {questions.map(({ question, answer }) => (
 
               <details className="faq-item" key={question}>
 
-                <summary>{question}</summary>
+                <summary><span>{question}</span><span className="faq-toggle" aria-hidden="true">+</span></summary>
 
                 <p>{answer}</p>
 
@@ -2135,6 +2135,7 @@ export function FAQs() {
             ))}
 
           </div>
+          <aside className="faq-support"><HeartPulse size={24} /><div><h2>Need more support?</h2><p>If your results concern you, talk with a qualified health professional. For immediate danger, contact your local emergency service.</p></div></aside>
 
         </div>
 

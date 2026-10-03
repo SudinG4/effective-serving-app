@@ -32,12 +32,19 @@ export function Logo() {
 }
 
 export function PublicHeader() {
+  const isLoggedIn = !!localStorage.getItem('wbc-user') &&
+    !!localStorage.getItem('wbc-access-token');
   return (
     <header className="public-header">
       <div className="shell nav">
         <Logo />
 
         <div className="nav-actions">
+          {isLoggedIn ? (
+            <Link className="button small" to="/dashboard">
+              Dashboard
+            </Link>
+          ) : <>
           <Link className="text-link" to="/login">
             Log In
           </Link>
@@ -45,6 +52,7 @@ export function PublicHeader() {
           <Link className="button small" to="/signup">
             Get Started
           </Link>
+          </>}
         </div>
       </div>
     </header>
@@ -459,10 +467,10 @@ export function BottomNav() {
         <span>Results</span>
       </NavLink>
 
-      <a href="#account">
+      <NavLink to="/account">
         <UserRound />
         <span>Account</span>
-      </a>
+      </NavLink>
     </nav>
   );
 }

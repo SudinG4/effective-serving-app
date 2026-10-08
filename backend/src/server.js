@@ -25,6 +25,7 @@ app.use(
   cors({
     origin:
       'http://localhost:5173',
+      'https://effective-serving-app.vercel.app'
     credentials: true
   })
 );
